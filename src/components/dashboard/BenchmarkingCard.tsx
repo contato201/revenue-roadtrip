@@ -171,15 +171,11 @@ export function BenchmarkingCard({ tipo, onBenchmarksGenerated }: BenchmarkingCa
 
         {kpis && (
           <div className="space-y-4 mt-6">
-            {/* Potencial de Conversões - Estilo Google Ads */}
+            {/* Investimento e Taxas Gerais */}
             <Card className="p-6 bg-gradient-to-r from-primary/10 to-accent/10 border-2 border-primary/30">
               <div className="space-y-3">
                 <p className="text-base text-foreground">
-                  Seu plano pode gerar até{" "}
-                  <span className="text-2xl font-bold text-primary mx-1">
-                    {kpis.conversoesPotenciais}
-                  </span>{" "}
-                  conversões por{" "}
+                  Investimento de exemplo:{" "}
                   <span className="text-xl font-bold text-foreground">
                     R$ {kpis.investimentoExemplo?.toLocaleString() || '0'}
                   </span>
@@ -189,82 +185,148 @@ export function BenchmarkingCard({ tipo, onBenchmarksGenerated }: BenchmarkingCa
                   </span>
                 </p>
                 
-                <div className="flex gap-4 text-sm text-muted-foreground">
-                  {kpis.taxaConversao && (
-                    <span>
-                      Taxa de conversão: <strong className="text-foreground">{kpis.taxaConversao.toFixed(2)}%</strong>
-                    </span>
-                  )}
-                  {kpis.custoAquisicaoCliente && (
-                    <span>
-                      Custo por conversão: <strong className="text-foreground">R$ {kpis.custoAquisicaoCliente.toFixed(2)}</strong>
-                    </span>
-                  )}
-                </div>
-
-                {kpis.fonteDados && (
-                  <div className="pt-3 border-t border-border/50">
-                    <p className="text-xs text-muted-foreground">
-                      <span className="font-semibold text-foreground">Fonte dos dados:</span> {kpis.fonteDados}
-                    </p>
+                {kpis.taxaConversao && (
+                  <div className="text-sm text-muted-foreground">
+                    Taxa de conversão média: <strong className="text-foreground">{kpis.taxaConversao.toFixed(2)}%</strong>
                   </div>
                 )}
               </div>
             </Card>
 
-            {/* Tabela de KPIs - Estilo Google Ads */}
-            <Card className="p-4 bg-card border-border/50">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-border">
-                      <th className="text-left text-xs font-semibold text-muted-foreground pb-2">Conversões</th>
-                      <th className="text-left text-xs font-semibold text-muted-foreground pb-2">CPA médio</th>
-                      <th className="text-left text-xs font-semibold text-muted-foreground pb-2">ROAS</th>
-                      <th className="text-left text-xs font-semibold text-muted-foreground pb-2">CTR</th>
-                      <th className="text-left text-xs font-semibold text-muted-foreground pb-2">CPC méd.</th>
-                      {kpis.cpm && (
-                        <th className="text-left text-xs font-semibold text-muted-foreground pb-2">CPM</th>
+            {/* Meta Ads e Google Ads lado a lado */}
+            <div className="grid md:grid-cols-2 gap-4">
+              {/* Meta Ads */}
+              {kpis.meta && (
+                <Card className="p-4 border-2 border-blue-500/30 bg-blue-500/5">
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                      <h4 className="text-lg font-bold text-foreground">Meta Ads</h4>
+                    </div>
+                    
+                    <div className="p-3 bg-blue-500/10 rounded-lg">
+                      <p className="text-xs text-muted-foreground mb-1">Conversões potenciais</p>
+                      <p className="text-3xl font-bold text-blue-600">
+                        {kpis.meta.conversoesPotenciais}
+                      </p>
+                    </div>
+
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">CPA médio:</span>
+                        <span className="font-semibold text-foreground">
+                          R$ {kpis.meta.custoAquisicaoCliente?.toFixed(2) || '—'}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">CTR:</span>
+                        <span className="font-semibold text-foreground">
+                          {kpis.meta.ctr ? `${kpis.meta.ctr.toFixed(2)}%` : '—'}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">CPC:</span>
+                        <span className="font-semibold text-foreground">
+                          R$ {kpis.meta.cpc?.toFixed(2) || '—'}
+                        </span>
+                      </div>
+                      {kpis.meta.cpm && (
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">CPM:</span>
+                          <span className="font-semibold text-foreground">
+                            R$ {kpis.meta.cpm.toFixed(2)}
+                          </span>
+                        </div>
                       )}
-                      <th className="text-left text-xs font-semibold text-muted-foreground pb-2">Impressões</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td className="pt-3 text-2xl font-bold text-foreground">
-                        {kpis.conversoesPotenciais}
-                      </td>
-                      <td className="pt-3 text-base font-semibold text-foreground">
-                        R$ {kpis.custoAquisicaoCliente?.toFixed(2) || '—'}
-                      </td>
-                      <td className="pt-3 text-base font-semibold text-foreground">
-                        {kpis.ticket && kpis.custoAquisicaoCliente 
-                          ? (kpis.ticket / kpis.custoAquisicaoCliente).toFixed(2) 
-                          : '—'}
-                      </td>
-                      <td className="pt-3 text-base font-semibold text-foreground">
-                        {kpis.ctr ? `${kpis.ctr.toFixed(2)}%` : '—'}
-                      </td>
-                      <td className="pt-3 text-base font-semibold text-foreground">
-                        R$ {kpis.cpc?.toFixed(2) || '—'}
-                      </td>
-                      {kpis.cpm && (
-                        <td className="pt-3 text-base font-semibold text-foreground">
-                          R$ {kpis.cpm.toFixed(2)}
-                        </td>
+                      {kpis.meta.custoLead && (
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Custo por lead:</span>
+                          <span className="font-semibold text-foreground">
+                            R$ {kpis.meta.custoLead.toFixed(2)}
+                          </span>
+                        </div>
                       )}
-                      <td className="pt-3 text-base font-semibold text-foreground">
-                        {kpis.impressoesPorConversao 
-                          ? (kpis.conversoesPotenciais * kpis.impressoesPorConversao).toLocaleString()
-                          : kpis.impressoesPorLead 
-                          ? (kpis.conversoesPotenciais * kpis.impressoesPorLead * 3).toLocaleString()
-                          : '—'}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </Card>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Impressões:</span>
+                        <span className="font-semibold text-foreground">
+                          {kpis.meta.impressoesPorLead 
+                            ? (kpis.meta.conversoesPotenciais * kpis.meta.impressoesPorLead).toLocaleString()
+                            : kpis.meta.impressoesPorConversao 
+                            ? (kpis.meta.conversoesPotenciais * kpis.meta.impressoesPorConversao).toLocaleString()
+                            : '—'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              )}
+
+              {/* Google Ads */}
+              {kpis.google && (
+                <Card className="p-4 border-2 border-green-500/30 bg-green-500/5">
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                      <h4 className="text-lg font-bold text-foreground">Google Ads</h4>
+                    </div>
+                    
+                    <div className="p-3 bg-green-500/10 rounded-lg">
+                      <p className="text-xs text-muted-foreground mb-1">Conversões potenciais</p>
+                      <p className="text-3xl font-bold text-green-600">
+                        {kpis.google.conversoesPotenciais}
+                      </p>
+                    </div>
+
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">CPA médio:</span>
+                        <span className="font-semibold text-foreground">
+                          R$ {kpis.google.custoAquisicaoCliente?.toFixed(2) || '—'}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">CTR:</span>
+                        <span className="font-semibold text-foreground">
+                          {kpis.google.ctr ? `${kpis.google.ctr.toFixed(2)}%` : '—'}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">CPC:</span>
+                        <span className="font-semibold text-foreground">
+                          R$ {kpis.google.cpc?.toFixed(2) || '—'}
+                        </span>
+                      </div>
+                      {kpis.google.cpm && (
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">CPM:</span>
+                          <span className="font-semibold text-foreground">
+                            R$ {kpis.google.cpm.toFixed(2)}
+                          </span>
+                        </div>
+                      )}
+                      {kpis.google.custoLead && (
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Custo por lead:</span>
+                          <span className="font-semibold text-foreground">
+                            R$ {kpis.google.custoLead.toFixed(2)}
+                          </span>
+                        </div>
+                      )}
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Impressões:</span>
+                        <span className="font-semibold text-foreground">
+                          {kpis.google.impressoesPorLead 
+                            ? (kpis.google.conversoesPotenciais * kpis.google.impressoesPorLead).toLocaleString()
+                            : kpis.google.impressoesPorConversao 
+                            ? (kpis.google.conversoesPotenciais * kpis.google.impressoesPorConversao).toLocaleString()
+                            : '—'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              )}
+            </div>
 
             {/* Análise */}
             {explicacao && (
