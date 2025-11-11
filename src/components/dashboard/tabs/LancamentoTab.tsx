@@ -16,7 +16,7 @@ export function LancamentoTab() {
   
   // Fatores que afetam o CPL (editáveis)
   const [ctr, setCtr] = useState(2.5);
-  const [conversaoPagina, setConversaoPagina] = useState(15);
+  const [conversaoPagina, setConversaoPagina] = useState(100);
 
   // Referências para o impacto no CPL (100% de performance)
   const ctrReferencia = 2.5; // CTR de referência (100% de performance)
@@ -27,7 +27,7 @@ export function LancamentoTab() {
   // Abaixo da referência, CPL aumenta (pior performance)
   // Acima da referência, CPL diminui (melhor performance)
   const fatorCtr = ctrReferencia / ctr;
-  const fatorConversao = conversaoReferencia / conversaoPagina;
+  const fatorConversao = 100 / conversaoPagina;
   const custoLead = cplBase * fatorCtr * fatorConversao;
 
   // Cálculos de investimento
@@ -142,13 +142,13 @@ export function LancamentoTab() {
             description="↑ CTR = ↓ CPL (mais cliques por impressão)"
           />
           <InputCard
-            label="Conversão da Página"
+            label="Conversão da Página (Performance)"
             value={conversaoPagina}
             onChange={setConversaoPagina}
             suffix="%"
-            step={0.5}
+            step={1}
             icon={<Percent className="w-4 h-4" />}
-            description="↑ Conversão = ↓ CPL (mais leads por clique)"
+            description="100% = referência; abaixo ↑ CPL, acima ↓ CPL"
           />
           <MetricCard
             label="CPL Real Ajustado"
