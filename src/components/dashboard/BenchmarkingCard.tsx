@@ -89,7 +89,7 @@ export function BenchmarkingCard({ tipo, onBenchmarksGenerated }: BenchmarkingCa
   };
 
   return (
-    <Card className="p-6 border border-border bg-card">
+    <Card className="p-6 border-2 border-border bg-card shadow-sm">
       <div className="space-y-4">
         <div className="flex items-center gap-3 mb-4 pb-4 border-b border-border">
           <div className="p-2 bg-primary/10 rounded-lg">

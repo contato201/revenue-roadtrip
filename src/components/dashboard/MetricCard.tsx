@@ -21,7 +21,7 @@ export function MetricCard({
 }: MetricCardProps) {
   return (
     <Card className={cn(
-      "p-5 border border-border hover:shadow-sm transition-all bg-card",
+      "p-5 border-2 border-border hover:shadow-md transition-all bg-card shadow-sm",
       className
     )}>
       <div className="flex items-start justify-between">

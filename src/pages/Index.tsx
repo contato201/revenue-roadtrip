@@ -8,7 +8,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header Minimalista */}
-      <header className="border-b border-border bg-card">
+      <header className="border-b-2 border-border bg-card shadow-sm">
         <div className="container mx-auto px-6 py-4 max-w-7xl">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -40,24 +40,24 @@ const Index = () => {
       <div className="container mx-auto py-12 px-6 max-w-7xl">
 
         <Tabs defaultValue="local" className="space-y-8">
-          <TabsList className="inline-flex h-auto p-1 bg-muted rounded-lg border border-border">
+          <TabsList className="inline-flex h-auto p-1.5 bg-muted rounded-lg border-2 border-border shadow-sm">
             <TabsTrigger 
               value="local" 
-              className="flex items-center gap-2 data-[state=active]:bg-card data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-border px-6 py-2.5 rounded-md transition-all"
+              className="flex items-center gap-2 data-[state=active]:bg-card data-[state=active]:shadow-md data-[state=active]:border-2 data-[state=active]:border-primary/30 px-6 py-2.5 rounded-md transition-all"
             >
               <Store className="w-4 h-4" />
               <span className="font-medium">Negócio Local</span>
             </TabsTrigger>
             <TabsTrigger 
               value="lancamento"
-              className="flex items-center gap-2 data-[state=active]:bg-card data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-border px-6 py-2.5 rounded-md transition-all"
+              className="flex items-center gap-2 data-[state=active]:bg-card data-[state=active]:shadow-md data-[state=active]:border-2 data-[state=active]:border-primary/30 px-6 py-2.5 rounded-md transition-all"
             >
               <Rocket className="w-4 h-4" />
               <span className="font-medium">Lançamento</span>
             </TabsTrigger>
             <TabsTrigger 
               value="perpetuo"
-              className="flex items-center gap-2 data-[state=active]:bg-card data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-border px-6 py-2.5 rounded-md transition-all"
+              className="flex items-center gap-2 data-[state=active]:bg-card data-[state=active]:shadow-md data-[state=active]:border-2 data-[state=active]:border-primary/30 px-6 py-2.5 rounded-md transition-all"
             >
               <RefreshCw className="w-4 h-4" />
               <span className="font-medium">Perpétuo</span>

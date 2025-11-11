@@ -8,26 +8,26 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Design Minimalista - Branco, Preto e Dourado como Accent */
-    --background: 0 0% 100%; /* Branco puro */
-    --foreground: 0 0% 10%; /* Preto suave */
+    /* Design Minimalista com Contraste - Branco, Preto e Dourado */
+    --background: 0 0% 98%; /* Fundo levemente off-white */
+    --foreground: 0 0% 5%; /* Preto mais escuro */
 
-    --card: 0 0% 100%; /* Cards brancos */
-    --card-foreground: 0 0% 10%;
+    --card: 0 0% 100%; /* Cards brancos puros para contraste */
+    --card-foreground: 0 0% 5%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 10%;
+    --popover-foreground: 0 0% 5%;
 
-    --primary: 46 47% 56%; /* #C3B366 dourado - apenas para destaques */
+    --primary: 46 47% 56%; /* #C3B366 dourado */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 0 0% 96%; /* Cinza muito claro */
-    --secondary-foreground: 0 0% 10%;
+    --secondary: 0 0% 94%; /* Cinza mais visível */
+    --secondary-foreground: 0 0% 5%;
 
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 45%;
+    --muted: 0 0% 94%;
+    --muted-foreground: 0 0% 40%;
 
-    --accent: 46 47% 56%; /* Dourado para accent */
+    --accent: 46 47% 56%;
     --accent-foreground: 0 0% 100%;
 
     --success: 142 76% 36%;
@@ -39,20 +39,20 @@ All colors MUST be HSL.
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 90%; /* Bordas sutis */
-    --input: 0 0% 90%;
-    --ring: 46 47% 56%; /* Anel dourado no foco */
+    --border: 0 0% 88%; /* Bordas mais visíveis */
+    --input: 0 0% 88%;
+    --ring: 46 47% 56%;
 
     --radius: 0.5rem;
 
     --gradient-primary: linear-gradient(135deg, hsl(46 47% 56%), hsl(46 47% 50%));
     --gradient-success: linear-gradient(135deg, hsl(142 76% 36%), hsl(142 76% 30%));
-    --gradient-card: none; /* Sem gradiente nos cards - minimalista */
+    --gradient-card: none;
 
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.03);
-    --shadow-md: 0 2px 4px 0 rgb(0 0 0 / 0.05);
-    --shadow-lg: 0 4px 12px 0 rgb(0 0 0 / 0.08);
-    --shadow-glow: 0 0 0 1px hsl(46 47% 56% / 0.1);
+    --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.06);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.08);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+    --shadow-glow: 0 0 0 1px hsl(46 47% 56% / 0.15);
 
     --transition-smooth: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }

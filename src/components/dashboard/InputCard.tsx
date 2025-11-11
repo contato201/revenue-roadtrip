@@ -30,7 +30,7 @@ export function InputCard({
   className 
 }: InputCardProps) {
   return (
-    <Card className={cn("p-5 border border-border hover:border-primary/20 transition-colors", className)}>
+    <Card className={cn("p-5 border-2 border-border hover:border-primary/30 transition-all shadow-sm hover:shadow-md bg-card", className)}>
       <div className="space-y-3">
         <div className="flex items-center gap-2">
           {icon && <div className="text-muted-foreground">{icon}</div>}
@@ -51,7 +51,7 @@ export function InputCard({
               onChange(numValue);
             }}
             className={cn(
-              "h-11 text-base font-semibold border border-input focus:border-primary focus:ring-1 focus:ring-primary transition-all bg-background",
+              "h-11 text-base font-semibold border-2 border-input focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all bg-muted",
               prefix && "pl-9",
               suffix && "pr-10"
             )}
