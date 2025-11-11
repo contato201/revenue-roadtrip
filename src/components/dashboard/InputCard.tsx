@@ -29,44 +29,28 @@ export function InputCard({
   min = 0,
   className 
 }: InputCardProps) {
-  const [displayValue, setDisplayValue] = useState("");
-  const [isFocused, setIsFocused] = useState(false);
-
-  useEffect(() => {
-    if (!isFocused) {
-      // Quando não está em foco, mostra o valor formatado
-      if (suffix === "%") {
-        setDisplayValue(value.toFixed(2));
-      } else {
-        setDisplayValue(value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
-      }
+  const formatValue = (val: number) => {
+    if (suffix === "%") {
+      return val.toString().replace('.', ',');
     }
-  }, [value, isFocused, suffix]);
-
-  const handleFocus = () => {
-    setIsFocused(true);
-    // Ao focar, mostra apenas o número puro para facilitar edição
-    setDisplayValue(value.toString().replace('.', ','));
-  };
-
-  const handleBlur = () => {
-    setIsFocused(false);
-    // Ao perder foco, atualiza o valor final
-    const rawValue = displayValue.replace(/\./g, '').replace(',', '.');
-    const numValue = parseFloat(rawValue) || 0;
-    onChange(numValue);
+    return val.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
-    // Permite apenas números, vírgula e ponto
-    const sanitized = inputValue.replace(/[^\d,\.]/g, '');
-    setDisplayValue(sanitized);
+    // Permite apenas números e vírgula
+    const sanitized = inputValue.replace(/[^\d,]/g, '');
     
-    // Atualiza o valor em tempo real
-    const rawValue = sanitized.replace(/\./g, '').replace(',', '.');
-    const numValue = parseFloat(rawValue) || 0;
-    onChange(numValue);
+    // Converte vírgula para ponto e parse
+    const rawValue = sanitized.replace(',', '.');
+    const numValue = parseFloat(rawValue);
+    
+    // Atualiza apenas se for um número válido ou string vazia
+    if (!isNaN(numValue)) {
+      onChange(numValue);
+    } else if (sanitized === '') {
+      onChange(0);
+    }
   };
 
   return (
@@ -84,10 +68,8 @@ export function InputCard({
           )}
           <Input
             type="text"
-            value={displayValue}
+            value={formatValue(value)}
             onChange={handleChange}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
             className={cn(
               "h-12 text-lg font-semibold border-2 border-input focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all bg-background text-foreground",
               prefix && "pl-12",
