@@ -8,26 +8,27 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 220 20% 97%;
-    --foreground: 222 47% 11%;
+    /* Cores Reproduzindo Talentos */
+    --background: 45 40% 92%; /* #EDE2CE bege claro */
+    --foreground: 0 0% 1%; /* #030303 preto */
 
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 0 0% 1%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover-foreground: 0 0% 1%;
 
-    --primary: 221 83% 53%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 46 47% 56%; /* #C3B366 dourado */
+    --primary-foreground: 0 0% 1%;
 
-    --secondary: 220 14% 96%;
-    --secondary-foreground: 222 47% 11%;
+    --secondary: 47 30% 70%; /* #B1A776 cinza claro */
+    --secondary-foreground: 0 0% 1%;
 
-    --muted: 220 14% 96%;
-    --muted-foreground: 215 16% 47%;
+    --muted: 45 40% 85%;
+    --muted-foreground: 0 0% 30%;
 
-    --accent: 142 76% 36%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 46 47% 56%; /* #C3B366 dourado */
+    --accent-foreground: 0 0% 1%;
 
     --success: 142 76% 36%;
     --success-foreground: 0 0% 100%;
@@ -38,45 +39,46 @@ All colors MUST be HSL.
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 221 83% 53%;
+    --border: 45 40% 80%;
+    --input: 45 40% 80%;
+    --ring: 46 47% 56%;
 
     --radius: 0.75rem;
 
-    --gradient-primary: linear-gradient(135deg, hsl(221 83% 53%), hsl(221 83% 63%));
+    --gradient-primary: linear-gradient(135deg, hsl(46 47% 56%), hsl(46 47% 66%));
     --gradient-success: linear-gradient(135deg, hsl(142 76% 36%), hsl(142 76% 46%));
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%), hsl(220 20% 99%));
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%), hsl(45 40% 95%));
 
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
     --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
     --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-    --shadow-glow: 0 0 24px hsl(221 83% 53% / 0.2);
+    --shadow-glow: 0 0 24px hsl(46 47% 56% / 0.3);
 
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .dark {
-    --background: 222 47% 11%;
-    --foreground: 210 40% 98%;
+    /* Dark mode com cores RT */
+    --background: 0 0% 8%; /* Preto suave */
+    --foreground: 45 40% 92%;
 
-    --card: 222 47% 14%;
-    --card-foreground: 210 40% 98%;
+    --card: 0 0% 12%;
+    --card-foreground: 45 40% 92%;
 
-    --popover: 222 47% 14%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 0 0% 12%;
+    --popover-foreground: 45 40% 92%;
 
-    --primary: 221 83% 53%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 46 47% 56%; /* Dourado mantido */
+    --primary-foreground: 0 0% 1%;
 
-    --secondary: 217 33% 18%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 0 0% 18%;
+    --secondary-foreground: 45 40% 92%;
 
-    --muted: 217 33% 18%;
-    --muted-foreground: 215 20% 65%;
+    --muted: 0 0% 18%;
+    --muted-foreground: 45 40% 70%;
 
-    --accent: 142 76% 36%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 46 47% 56%;
+    --accent-foreground: 0 0% 1%;
 
     --success: 142 76% 36%;
     --success-foreground: 0 0% 100%;
@@ -85,15 +87,15 @@ All colors MUST be HSL.
     --warning-foreground: 0 0% 100%;
 
     --destructive: 0 63% 31%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 45 40% 92%;
 
-    --border: 217 33% 18%;
-    --input: 217 33% 18%;
-    --ring: 221 83% 53%;
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 46 47% 56%;
 
-    --gradient-primary: linear-gradient(135deg, hsl(221 83% 53%), hsl(221 83% 43%));
+    --gradient-primary: linear-gradient(135deg, hsl(46 47% 56%), hsl(46 47% 46%));
     --gradient-success: linear-gradient(135deg, hsl(142 76% 36%), hsl(142 76% 26%));
-    --gradient-card: linear-gradient(180deg, hsl(222 47% 14%), hsl(222 47% 16%));
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 12%), hsl(0 0% 14%));
   }
 }
 
@@ -103,6 +105,10 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-body;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display;
   }
 }
