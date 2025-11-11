@@ -11,10 +11,11 @@ serve(async (req) => {
   }
 
   try {
-    const { tipo, segmento, regiao }: { 
+    const { tipo, segmento, regiao, produto }: { 
       tipo: "local" | "lancamento" | "perpetuo", 
       segmento: string, 
-      regiao: string 
+      regiao: string,
+      produto: string
     } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
@@ -22,36 +23,43 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    console.log("Generating benchmarks for:", { tipo, segmento, regiao });
+    console.log("Generating benchmarks for:", { tipo, segmento, regiao, produto });
 
     // Sistema de prompts diferente para cada tipo
     const systemPrompts = {
-      local: `Você é um especialista em marketing digital para negócios locais no Brasil. 
-Analise o segmento e região fornecidos e retorne benchmarks realistas baseados em dados de mercado.
-Considere: custo de vida da região, competição no segmento, ticket médio típico do setor.`,
+      local: `Você é um especialista em marketing digital para negócios locais no Brasil com dados de Meta Ads e Google Ads. 
+Analise o segmento, produto/serviço e região fornecidos e retorne benchmarks REALISTAS de anúncios online.
+Use dados reais do mercado brasileiro considerando: custo de vida da região, competição no segmento, comportamento digital local.
+Seja ESPECÍFICO com números baseados em dados reais de campanhas.`,
       
-      lancamento: `Você é um especialista em lançamentos digitais no Brasil.
-Analise o segmento fornecido e retorne benchmarks realistas para campanhas de lançamento.
-Considere: CPM médio para o nicho, taxa de conversão típica, ticket médio do mercado.`,
+      lancamento: `Você é um especialista em lançamentos digitais no Brasil com expertise em Meta Ads e Google Ads.
+Analise o segmento e produto fornecidos e retorne benchmarks REALISTAS baseados em dados reais de mercado.
+Use métricas reais de CPM, CPC, CTR para o nicho específico. Seja preciso com os números.`,
       
-      perpetuo: `Você é um especialista em negócios perpétuos e evergreen no Brasil.
-Analise o segmento fornecido e retorne benchmarks realistas para vendas contínuas.
-Considere: custo por lead, taxa de conversão recorrente, ticket médio sustentável.`
+      perpetuo: `Você é um especialista em negócios perpétuos no Brasil com expertise em Meta Ads e Google Ads.
+Analise o segmento e produto fornecidos e retorne benchmarks REALISTAS de tráfego pago contínuo.
+Use dados reais de custo por lead, CPC médio, CTR típico do nicho. Seja específico.`
     };
 
     const userPrompts = {
       local: `Segmento: ${segmento}
+Produto/Serviço: ${produto}
 Região: ${regiao}
 
-Forneça benchmarks realistas para este negócio local considerando a realidade brasileira.`,
+Forneça KPIs REAIS de Meta Ads e Google Ads para esta região e produto específico. 
+Inclua: CPC médio, CTR esperado, custo por lead realista, taxas de conversão do funil completo.`,
       
       lancamento: `Segmento: ${segmento}
+Produto/Serviço: ${produto}
 
-Forneça benchmarks realistas para um lançamento digital neste segmento.`,
+Forneça KPIs REAIS de tráfego pago para lançamento deste produto.
+Inclua: CPM médio do nicho, CPC, CTR, taxa de conversão realista para landing pages de lançamento.`,
       
       perpetuo: `Segmento: ${segmento}
+Produto/Serviço: ${produto}
 
-Forneça benchmarks realistas para um negócio perpétuo neste segmento.`
+Forneça KPIs REAIS de tráfego pago perpétuo para este produto.
+Inclua: custo por mensagem/lead, CPC médio, CTR, taxa de conversão para funil evergreen.`
     };
 
     const tools = {
@@ -59,10 +67,18 @@ Forneça benchmarks realistas para um negócio perpétuo neste segmento.`
         type: "function",
         function: {
           name: "retornar_benchmarks_local",
-          description: "Retorna benchmarks para negócio local",
+          description: "Retorna benchmarks completos para negócio local",
           parameters: {
             type: "object",
             properties: {
+              cpc: {
+                type: "number",
+                description: "CPC médio em R$ para anúncios nesta região"
+              },
+              ctr: {
+                type: "number",
+                description: "CTR médio em % para anúncios nesta região"
+              },
               custoLead: {
                 type: "number",
                 description: "Custo médio por lead em R$"
@@ -83,12 +99,16 @@ Forneça benchmarks realistas para um negócio perpétuo neste segmento.`
                 type: "number",
                 description: "Ticket médio em R$"
               },
+              impressoesPorLead: {
+                type: "number",
+                description: "Número aproximado de impressões necessárias para gerar 1 lead"
+              },
               explicacao: {
                 type: "string",
-                description: "Breve explicação sobre os valores sugeridos"
+                description: "Explicação detalhada sobre os KPIs baseados em dados da região e produto"
               }
             },
-            required: ["custoLead", "taxaAgendamento", "taxaComparecimento", "taxaFechamento", "ticketMedio", "explicacao"],
+            required: ["cpc", "ctr", "custoLead", "taxaAgendamento", "taxaComparecimento", "taxaFechamento", "ticketMedio", "impressoesPorLead", "explicacao"],
             additionalProperties: false
           }
         }
@@ -97,28 +117,40 @@ Forneça benchmarks realistas para um negócio perpétuo neste segmento.`
         type: "function",
         function: {
           name: "retornar_benchmarks_lancamento",
-          description: "Retorna benchmarks para lançamento",
+          description: "Retorna benchmarks completos para lançamento",
           parameters: {
             type: "object",
             properties: {
               cpm: {
                 type: "number",
-                description: "CPM médio em R$"
+                description: "CPM médio em R$ para o nicho"
+              },
+              cpc: {
+                type: "number",
+                description: "CPC médio em R$ para o nicho"
+              },
+              ctr: {
+                type: "number",
+                description: "CTR médio em % para anúncios de lançamento"
               },
               taxaConversao: {
                 type: "number",
-                description: "Taxa de conversão média em %"
+                description: "Taxa de conversão média da landing page em %"
               },
               ticket: {
                 type: "number",
                 description: "Ticket médio em R$"
               },
+              impressoesPorConversao: {
+                type: "number",
+                description: "Número aproximado de impressões para gerar 1 conversão"
+              },
               explicacao: {
                 type: "string",
-                description: "Breve explicação sobre os valores sugeridos"
+                description: "Explicação detalhada sobre os KPIs baseados em dados do nicho e produto"
               }
             },
-            required: ["cpm", "taxaConversao", "ticket", "explicacao"],
+            required: ["cpm", "cpc", "ctr", "taxaConversao", "ticket", "impressoesPorConversao", "explicacao"],
             additionalProperties: false
           }
         }
@@ -127,13 +159,21 @@ Forneça benchmarks realistas para um negócio perpétuo neste segmento.`
         type: "function",
         function: {
           name: "retornar_benchmarks_perpetuo",
-          description: "Retorna benchmarks para negócio perpétuo",
+          description: "Retorna benchmarks completos para negócio perpétuo",
           parameters: {
             type: "object",
             properties: {
+              cpc: {
+                type: "number",
+                description: "CPC médio em R$ para tráfego perpétuo"
+              },
+              ctr: {
+                type: "number",
+                description: "CTR médio em % para o nicho"
+              },
               custoMensagem: {
                 type: "number",
-                description: "Custo por mensagem em R$"
+                description: "Custo por mensagem/lead em R$"
               },
               taxaConversao: {
                 type: "number",
@@ -143,12 +183,16 @@ Forneça benchmarks realistas para um negócio perpétuo neste segmento.`
                 type: "number",
                 description: "Ticket médio em R$"
               },
+              cliquesParaConversao: {
+                type: "number",
+                description: "Número médio de cliques necessários para 1 conversão"
+              },
               explicacao: {
                 type: "string",
-                description: "Breve explicação sobre os valores sugeridos"
+                description: "Explicação detalhada sobre os KPIs baseados em dados do nicho e produto"
               }
             },
-            required: ["custoMensagem", "taxaConversao", "ticket", "explicacao"],
+            required: ["cpc", "ctr", "custoMensagem", "taxaConversao", "ticket", "cliquesParaConversao", "explicacao"],
             additionalProperties: false
           }
         }
