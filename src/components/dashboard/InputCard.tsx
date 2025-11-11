@@ -30,15 +30,15 @@ export function InputCard({
   className 
 }: InputCardProps) {
   return (
-    <Card className={cn("p-6 bg-gradient-card border-border/50", className)}>
+    <Card className={cn("p-5 border border-border hover:border-primary/20 transition-colors", className)}>
       <div className="space-y-3">
         <div className="flex items-center gap-2">
-          {icon && <div className="text-primary">{icon}</div>}
-          <Label className="text-sm font-semibold text-foreground">{label}</Label>
+          {icon && <div className="text-muted-foreground">{icon}</div>}
+          <Label className="text-sm font-medium text-foreground">{label}</Label>
         </div>
         <div className="relative">
           {prefix && (
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
               {prefix}
             </span>
           )}
@@ -51,13 +51,13 @@ export function InputCard({
               onChange(numValue);
             }}
             className={cn(
-              "h-12 text-lg font-semibold border-2 focus:border-primary transition-smooth",
-              prefix && "pl-10",
-              suffix && "pr-12"
+              "h-11 text-base font-semibold border border-input focus:border-primary focus:ring-1 focus:ring-primary transition-all bg-background",
+              prefix && "pl-9",
+              suffix && "pr-10"
             )}
           />
           {suffix && (
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
               {suffix}
             </span>
           )}

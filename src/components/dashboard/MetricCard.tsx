@@ -21,14 +21,14 @@ export function MetricCard({
 }: MetricCardProps) {
   return (
     <Card className={cn(
-      "p-6 bg-gradient-card border-border/50 hover:shadow-md transition-smooth",
+      "p-5 border border-border hover:shadow-sm transition-all bg-card",
       className
     )}>
       <div className="flex items-start justify-between">
         <div className="flex-1">
-          <p className="text-sm font-medium text-muted-foreground mb-1">{label}</p>
+          <p className="text-sm font-medium text-muted-foreground mb-2">{label}</p>
           <p className={cn(
-            "text-3xl font-bold",
+            "text-2xl font-display font-semibold",
             variant === "success" && "text-success",
             variant === "warning" && "text-warning",
             variant === "primary" && "text-primary",
@@ -42,7 +42,7 @@ export function MetricCard({
         </div>
         {icon && (
           <div className={cn(
-            "p-3 rounded-lg",
+            "p-2.5 rounded-lg",
             variant === "success" && "bg-success/10 text-success",
             variant === "warning" && "bg-warning/10 text-warning",
             variant === "primary" && "bg-primary/10 text-primary",

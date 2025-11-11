@@ -8,27 +8,27 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Cores Reproduzindo Talentos */
-    --background: 45 40% 92%; /* #EDE2CE bege claro */
-    --foreground: 0 0% 1%; /* #030303 preto */
+    /* Design Minimalista - Branco, Preto e Dourado como Accent */
+    --background: 0 0% 100%; /* Branco puro */
+    --foreground: 0 0% 10%; /* Preto suave */
 
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 1%;
+    --card: 0 0% 100%; /* Cards brancos */
+    --card-foreground: 0 0% 10%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 1%;
+    --popover-foreground: 0 0% 10%;
 
-    --primary: 46 47% 56%; /* #C3B366 dourado */
-    --primary-foreground: 0 0% 1%;
+    --primary: 46 47% 56%; /* #C3B366 dourado - apenas para destaques */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 47 30% 70%; /* #B1A776 cinza claro */
-    --secondary-foreground: 0 0% 1%;
+    --secondary: 0 0% 96%; /* Cinza muito claro */
+    --secondary-foreground: 0 0% 10%;
 
-    --muted: 45 40% 85%;
-    --muted-foreground: 0 0% 30%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
 
-    --accent: 46 47% 56%; /* #C3B366 dourado */
-    --accent-foreground: 0 0% 1%;
+    --accent: 46 47% 56%; /* Dourado para accent */
+    --accent-foreground: 0 0% 100%;
 
     --success: 142 76% 36%;
     --success-foreground: 0 0% 100%;
@@ -39,46 +39,46 @@ All colors MUST be HSL.
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 45 40% 80%;
-    --input: 45 40% 80%;
-    --ring: 46 47% 56%;
+    --border: 0 0% 90%; /* Bordas sutis */
+    --input: 0 0% 90%;
+    --ring: 46 47% 56%; /* Anel dourado no foco */
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
 
-    --gradient-primary: linear-gradient(135deg, hsl(46 47% 56%), hsl(46 47% 66%));
-    --gradient-success: linear-gradient(135deg, hsl(142 76% 36%), hsl(142 76% 46%));
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%), hsl(45 40% 95%));
+    --gradient-primary: linear-gradient(135deg, hsl(46 47% 56%), hsl(46 47% 50%));
+    --gradient-success: linear-gradient(135deg, hsl(142 76% 36%), hsl(142 76% 30%));
+    --gradient-card: none; /* Sem gradiente nos cards - minimalista */
 
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-    --shadow-glow: 0 0 24px hsl(46 47% 56% / 0.3);
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.03);
+    --shadow-md: 0 2px 4px 0 rgb(0 0 0 / 0.05);
+    --shadow-lg: 0 4px 12px 0 rgb(0 0 0 / 0.08);
+    --shadow-glow: 0 0 0 1px hsl(46 47% 56% / 0.1);
 
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-smooth: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .dark {
-    /* Dark mode com cores RT */
-    --background: 0 0% 8%; /* Preto suave */
-    --foreground: 45 40% 92%;
+    /* Dark mode minimalista */
+    --background: 0 0% 7%; /* Preto profundo */
+    --foreground: 0 0% 95%;
 
-    --card: 0 0% 12%;
-    --card-foreground: 45 40% 92%;
+    --card: 0 0% 10%;
+    --card-foreground: 0 0% 95%;
 
-    --popover: 0 0% 12%;
-    --popover-foreground: 45 40% 92%;
+    --popover: 0 0% 10%;
+    --popover-foreground: 0 0% 95%;
 
     --primary: 46 47% 56%; /* Dourado mantido */
-    --primary-foreground: 0 0% 1%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 0 0% 18%;
-    --secondary-foreground: 45 40% 92%;
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 95%;
 
-    --muted: 0 0% 18%;
-    --muted-foreground: 45 40% 70%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 60%;
 
     --accent: 46 47% 56%;
-    --accent-foreground: 0 0% 1%;
+    --accent-foreground: 0 0% 100%;
 
     --success: 142 76% 36%;
     --success-foreground: 0 0% 100%;
@@ -87,15 +87,15 @@ All colors MUST be HSL.
     --warning-foreground: 0 0% 100%;
 
     --destructive: 0 63% 31%;
-    --destructive-foreground: 45 40% 92%;
+    --destructive-foreground: 0 0% 95%;
 
     --border: 0 0% 20%;
     --input: 0 0% 20%;
     --ring: 46 47% 56%;
 
-    --gradient-primary: linear-gradient(135deg, hsl(46 47% 56%), hsl(46 47% 46%));
-    --gradient-success: linear-gradient(135deg, hsl(142 76% 36%), hsl(142 76% 26%));
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 12%), hsl(0 0% 14%));
+    --gradient-primary: linear-gradient(135deg, hsl(46 47% 56%), hsl(46 47% 50%));
+    --gradient-success: linear-gradient(135deg, hsl(142 76% 36%), hsl(142 76% 30%));
+    --gradient-card: none;
   }
 }
 

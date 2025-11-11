@@ -89,14 +89,14 @@ export function BenchmarkingCard({ tipo, onBenchmarksGenerated }: BenchmarkingCa
   };
 
   return (
-    <Card className="p-6 bg-gradient-to-br from-primary/5 to-accent/5 border-2 border-primary/20">
+    <Card className="p-6 border border-border bg-card">
       <div className="space-y-4">
-        <div className="flex items-center gap-2 mb-4">
+        <div className="flex items-center gap-3 mb-4 pb-4 border-b border-border">
           <div className="p-2 bg-primary/10 rounded-lg">
             <Sparkles className="w-5 h-5 text-primary" />
           </div>
           <div>
-            <h3 className="text-lg font-bold text-foreground">Benchmarking Inteligente</h3>
+            <h3 className="text-lg font-display font-semibold text-foreground">Benchmarking Inteligente</h3>
             <p className="text-sm text-muted-foreground">
               IA sugere valores baseados no seu mercado
             </p>
@@ -154,7 +154,7 @@ export function BenchmarkingCard({ tipo, onBenchmarksGenerated }: BenchmarkingCa
         <Button
           onClick={handleGenerate}
           disabled={isLoading}
-          className="w-full bg-gradient-primary text-primary-foreground hover:opacity-90"
+          className="w-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors font-medium"
         >
           {isLoading ? (
             <>

@@ -40,17 +40,18 @@ export function NegocioLocalTab() {
       />
 
       {/* Explicação Simples */}
-      <Card className="p-6 bg-gradient-primary text-primary-foreground">
-        <h3 className="text-xl font-bold mb-2">Como Funciona?</h3>
-        <p className="text-sm opacity-90">
+      <Card className="p-6 border-l-4 border-l-primary bg-card">
+        <h3 className="text-lg font-display font-semibold text-foreground mb-2">Como Funciona?</h3>
+        <p className="text-sm text-muted-foreground">
           Este simulador mostra de forma simples quanto você pode faturar investindo em anúncios online. 
           Ajuste os valores abaixo para ver o resultado em tempo real!
         </p>
       </Card>
 
-      {/* Inputs Simples */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-foreground">1️⃣ Quanto você vai investir?</h3>
+        <div className="flex items-center gap-2 border-l-4 border-l-primary pl-4">
+          <h3 className="text-base font-display font-semibold text-foreground">1️⃣ Quanto você vai investir?</h3>
+        </div>
         <div className="grid gap-4 md:grid-cols-2">
           <InputCard
             label="Investimento Total"
@@ -72,7 +73,9 @@ export function NegocioLocalTab() {
       </div>
 
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-foreground">2️⃣ Como seus clientes se comportam?</h3>
+        <div className="flex items-center gap-2 border-l-4 border-l-primary pl-4">
+          <h3 className="text-base font-display font-semibold text-foreground">2️⃣ Como seus clientes se comportam?</h3>
+        </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <InputCard
             label="Taxa de Agendamento"
@@ -109,9 +112,10 @@ export function NegocioLocalTab() {
         </div>
       </div>
 
-      {/* Resultados Visuais */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-foreground">3️⃣ Seus Resultados</h3>
+        <div className="flex items-center gap-2 border-l-4 border-l-primary pl-4 mb-4">
+          <h3 className="text-base font-display font-semibold text-foreground">3️⃣ Seus Resultados</h3>
+        </div>
         
         {/* Funil Visual */}
         <div className="grid gap-4 md:grid-cols-5">
@@ -148,13 +152,13 @@ export function NegocioLocalTab() {
         </div>
 
         {/* CAC em Destaque */}
-        <Card className="p-6 bg-primary/5 border-primary/20">
+        <Card className="p-6 border border-primary/30 bg-primary/5">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-muted-foreground mb-1">
                 CAC - Custo de Aquisição de Cliente
               </p>
-              <p className="text-4xl font-bold text-primary">
+              <p className="text-4xl font-display font-bold text-primary">
                 R$ {cac.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
               </p>
               <p className="text-sm text-muted-foreground mt-2">
@@ -169,15 +173,17 @@ export function NegocioLocalTab() {
 
         {/* Resultado Final */}
         <div className="grid gap-4 md:grid-cols-2">
-          <Card className="p-8 bg-gradient-success text-success-foreground">
+          <Card className="p-8 border-l-4 border-l-success bg-success/5">
             <div className="flex items-center gap-4">
-              <TrendingUp className="w-12 h-12" />
+              <div className="p-3 bg-success/10 rounded-lg">
+                <TrendingUp className="w-10 h-10 text-success" />
+              </div>
               <div>
-                <p className="text-sm font-medium opacity-90 mb-1">SEU LUCRO</p>
-                <p className="text-4xl font-bold">
+                <p className="text-sm font-medium text-muted-foreground mb-1">SEU LUCRO</p>
+                <p className="text-4xl font-display font-bold text-success">
                   R$ {lucro.toLocaleString('pt-BR')}
                 </p>
-                <p className="text-sm opacity-90 mt-2">
+                <p className="text-sm text-muted-foreground mt-2">
                   {lucro > 0 
                     ? `Você lucrará ${roi.toFixed(0)}% sobre o investimento! 🎉` 
                     : 'Ajuste os valores para ter lucro'}
@@ -186,7 +192,7 @@ export function NegocioLocalTab() {
             </div>
           </Card>
 
-          <Card className="p-8 bg-card">
+          <Card className="p-8 bg-card border border-border">
             <div className="space-y-3">
               <p className="text-sm font-semibold text-muted-foreground">Resumo Simples:</p>
               <div className="space-y-2 text-sm">

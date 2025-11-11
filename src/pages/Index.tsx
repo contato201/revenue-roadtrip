@@ -8,55 +8,59 @@ import logoRT from "@/assets/logo-rt.jpg";
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto py-8 px-4 max-w-7xl">
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-gradient-primary rounded-lg">
-                <BarChart3 className="w-6 h-6 text-primary-foreground" />
-              </div>
-              <div>
-                <h1 className="text-4xl font-bold text-foreground">
+      {/* Header Minimalista */}
+      <header className="border-b border-border bg-card">
+        <div className="container mx-auto px-6 py-4 max-w-7xl">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <img 
+                src={logoRT} 
+                alt="Reproduzindo Talentos" 
+                className="h-12 object-contain"
+              />
+              <div className="border-l border-border pl-4">
+                <h1 className="text-2xl font-display font-semibold text-foreground tracking-tight">
                   Dashboard de Previsão
                 </h1>
-                <p className="text-muted-foreground">
-                  Simule e planeje seus investimentos em marketing digital
+                <p className="text-sm text-muted-foreground">
+                  Simule seus investimentos em marketing
                 </p>
               </div>
             </div>
-            <img 
-              src={logoRT} 
-              alt="Reproduzindo Talentos" 
-              className="h-16 object-contain"
-            />
+            <div className="flex items-center gap-2">
+              <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-muted rounded-full">
+                <BarChart3 className="w-4 h-4 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">Analytics</span>
+              </div>
+            </div>
           </div>
         </div>
+      </header>
 
-        <Tabs defaultValue="local" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 h-auto p-1 bg-muted/50">
+      <div className="container mx-auto py-12 px-6 max-w-7xl">
+
+        <Tabs defaultValue="local" className="space-y-8">
+          <TabsList className="inline-flex h-auto p-1 bg-muted rounded-lg border border-border">
             <TabsTrigger 
               value="local" 
-              className="flex items-center gap-2 data-[state=active]:bg-card data-[state=active]:shadow-md py-3"
+              className="flex items-center gap-2 data-[state=active]:bg-card data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-border px-6 py-2.5 rounded-md transition-all"
             >
               <Store className="w-4 h-4" />
-              <span className="hidden sm:inline">Negócio Local</span>
-              <span className="sm:hidden">Local</span>
+              <span className="font-medium">Negócio Local</span>
             </TabsTrigger>
             <TabsTrigger 
               value="lancamento"
-              className="flex items-center gap-2 data-[state=active]:bg-card data-[state=active]:shadow-md py-3"
+              className="flex items-center gap-2 data-[state=active]:bg-card data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-border px-6 py-2.5 rounded-md transition-all"
             >
               <Rocket className="w-4 h-4" />
-              <span className="hidden sm:inline">Lançamento</span>
-              <span className="sm:hidden">Lanç.</span>
+              <span className="font-medium">Lançamento</span>
             </TabsTrigger>
             <TabsTrigger 
               value="perpetuo"
-              className="flex items-center gap-2 data-[state=active]:bg-card data-[state=active]:shadow-md py-3"
+              className="flex items-center gap-2 data-[state=active]:bg-card data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-border px-6 py-2.5 rounded-md transition-all"
             >
               <RefreshCw className="w-4 h-4" />
-              <span className="hidden sm:inline">Perpétuo</span>
-              <span className="sm:hidden">Perp.</span>
+              <span className="font-medium">Perpétuo</span>
             </TabsTrigger>
           </TabsList>
 
