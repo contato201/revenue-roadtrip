@@ -2,41 +2,42 @@ import { useState } from "react";
 import { InputCard } from "../InputCard";
 import { MetricCard } from "../MetricCard";
 import { BenchmarkingCard } from "../BenchmarkingCard";
-import { TrendingUp, DollarSign, Target, Percent } from "lucide-react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { TrendingUp, DollarSign, Target, Percent, MousePointerClick } from "lucide-react";
 
 export function LancamentoTab() {
-  const [investimentoTotal, setInvestimentoTotal] = useState(15000);
-  const [custoLead, setCustoLead] = useState(3);
-  const [taxaBaseLeads, setTaxaBaseLeads] = useState(1.20);
+  // Inputs principais
+  const [investimentoTotal, setInvestimentoTotal] = useState(1000);
+  const [custoLead, setCustoLead] = useState(30);
+  const [taxaConversao, setTaxaConversao] = useState(1.2);
   const [ticket, setTicket] = useState(997);
+  
+  // Percentual de captação
+  const [percentualCaptacao, setPercentualCaptacao] = useState(70);
+  
+  // Fatores que afetam o CPL (editáveis)
+  const [ctr, setCtr] = useState(2.5);
+  const [conversaoPagina, setConversaoPagina] = useState(15);
 
-  // Cálculos automáticos de CTR e Connect Rate
-  const ctr = 2.5; // CTR padrão do mercado
-  const connectRate = 80; // Taxa de connect padrão
+  // Cálculos de investimento
+  const investimentoCaptacao = investimentoTotal * (percentualCaptacao / 100);
+  const investimentoOutros = investimentoTotal - investimentoCaptacao;
 
-  // Cálculos baseados no CPL selecionado
+  // Cálculos de leads e vendas
   const numeroLeads = Math.round(investimentoTotal / custoLead);
-  const baseLeads = Math.round(numeroLeads * (taxaBaseLeads / 100));
-  const vendas = baseLeads;
-  const faturamentoBruto = vendas * ticket;
-  const lucro = faturamentoBruto - investimentoTotal;
+  const numeroVendas = Math.round(numeroLeads * (taxaConversao / 100));
+  
+  // Cálculos financeiros
+  const faturamentoBruto = numeroVendas * ticket;
+  const lucroBruto = faturamentoBruto - investimentoTotal;
   const roas = investimentoTotal > 0 ? faturamentoBruto / investimentoTotal : 0;
 
-  // Cenários de CPL para tabela
-  const cenariosCPL = [2, 3, 4, 5, 6, 7];
-  const calcularCenario = (cpl: number) => {
-    const leads = Math.round(investimentoTotal / cpl);
-    const base = Math.round(leads * (taxaBaseLeads / 100));
-    const vendas = base;
-    const retorno = vendas * ticket;
-    const roasCenario = investimentoTotal > 0 ? retorno / investimentoTotal : 0;
-    return { leads, base, vendas, retorno, roas: roasCenario };
-  };
+  // Cálculo de CPL estimado baseado em CTR e conversão da página
+  const cplEstimado = custoLead * (1 / (ctr / 100)) * (1 / (conversaoPagina / 100));
 
   const handleBenchmarksGenerated = (benchmarks: any) => {
     if (benchmarks.custoLead) setCustoLead(benchmarks.custoLead);
     if (benchmarks.ticket) setTicket(benchmarks.ticket);
+    if (benchmarks.meta?.ctr) setCtr(benchmarks.meta.ctr);
   };
 
   return (
@@ -50,7 +51,7 @@ export function LancamentoTab() {
       {/* Inputs Principais */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <InputCard
-          label="Investimento Total em tráfego"
+          label="Investimento Total"
           value={investimentoTotal}
           onChange={setInvestimentoTotal}
           prefix="R$"
@@ -67,16 +68,16 @@ export function LancamentoTab() {
           description="Custo por lead"
         />
         <InputCard
-          label="% de Base de leads"
-          value={taxaBaseLeads}
-          onChange={setTaxaBaseLeads}
+          label="Taxa de Conversão"
+          value={taxaConversao}
+          onChange={setTaxaConversao}
           suffix="%"
-          step={0.01}
+          step={0.1}
           icon={<Percent className="w-4 h-4" />}
-          description="Taxa de conversão para vendas"
+          description="% de leads que convertem"
         />
         <InputCard
-          label="Ticket"
+          label="Ticket Médio"
           value={ticket}
           onChange={setTicket}
           prefix="R$"
@@ -85,97 +86,109 @@ export function LancamentoTab() {
         />
       </div>
 
-      {/* Métricas Automáticas CTR e Connect Rate */}
-      <div className="grid gap-4 md:grid-cols-2">
-        <MetricCard
-          label="CTR (Taxa de Clique)"
-          value={`${ctr}%`}
-          variant="default"
-          description={`CTR de ${ctr}% reduz o custo por clique, impactando diretamente o CPL`}
-        />
-        <MetricCard
-          label="Connect Rate"
-          value={`${connectRate}%`}
-          variant="default"
-          description={`${connectRate}% dos leads conectam, afetando a taxa de conversão final`}
-        />
-      </div>
-
-      {/* Tabela de Cenários */}
+      {/* Distribuição de Investimento */}
       <div className="bg-card border-2 border-border rounded-lg p-6">
-        <h3 className="text-lg font-display font-bold mb-4 text-foreground">Lançamentos - Cenários por CPL</h3>
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="font-bold">CPL médio</TableHead>
-                <TableHead className="font-bold">Nº de Leads</TableHead>
-                <TableHead className="font-bold">% da Base de leads</TableHead>
-                <TableHead className="font-bold">Nº de Vendas</TableHead>
-                <TableHead className="font-bold">Ticket</TableHead>
-                <TableHead className="font-bold">Retorno em Vendas</TableHead>
-                <TableHead className="font-bold">ROAS</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {cenariosCPL.map((cpl) => {
-                const cenario = calcularCenario(cpl);
-                const isSelected = cpl === custoLead;
-                return (
-                  <TableRow 
-                    key={cpl} 
-                    className={isSelected ? "bg-primary/5" : ""}
-                  >
-                    <TableCell className="font-semibold">R$ {cpl.toFixed(2)}</TableCell>
-                    <TableCell>{cenario.leads.toLocaleString('pt-BR')}</TableCell>
-                    <TableCell>{taxaBaseLeads.toFixed(2)}%</TableCell>
-                    <TableCell>{cenario.vendas}</TableCell>
-                    <TableCell>R$ {ticket.toLocaleString('pt-BR')}</TableCell>
-                    <TableCell>R$ {cenario.retorno.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</TableCell>
-                    <TableCell className="font-semibold">{cenario.roas.toFixed(2)}</TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
+        <h3 className="text-lg font-display font-bold mb-4 text-foreground">Distribuição do Investimento</h3>
+        <div className="grid gap-4 md:grid-cols-3">
+          <InputCard
+            label="% para Captação"
+            value={percentualCaptacao}
+            onChange={setPercentualCaptacao}
+            suffix="%"
+            step={1}
+            icon={<Percent className="w-4 h-4" />}
+            description="Quanto vai para captação de leads"
+          />
+          <MetricCard
+            label="Investimento em Captação"
+            value={`R$ ${investimentoCaptacao.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
+            variant="primary"
+            description={`${percentualCaptacao}% do investimento total`}
+          />
+          <MetricCard
+            label="Outros Investimentos"
+            value={`R$ ${investimentoOutros.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
+            variant="default"
+            description={`${(100 - percentualCaptacao)}% do investimento total`}
+          />
         </div>
       </div>
 
-      {/* Investimentos */}
+      {/* Fatores que Afetam o CPL */}
+      <div className="bg-card border-2 border-border rounded-lg p-6">
+        <h3 className="text-lg font-display font-bold mb-4 text-foreground">
+          Fatores que Afetam o Custo por Lead
+        </h3>
+        <p className="text-sm text-muted-foreground mb-4">
+          Ajuste CTR e taxa de conversão da página para ver como impactam o CPL estimado
+        </p>
+        <div className="grid gap-4 md:grid-cols-3">
+          <InputCard
+            label="CTR (Taxa de Clique)"
+            value={ctr}
+            onChange={setCtr}
+            suffix="%"
+            step={0.1}
+            icon={<MousePointerClick className="w-4 h-4" />}
+            description="% de pessoas que clicam"
+          />
+          <InputCard
+            label="Conversão da Página"
+            value={conversaoPagina}
+            onChange={setConversaoPagina}
+            suffix="%"
+            step={0.5}
+            icon={<Percent className="w-4 h-4" />}
+            description="% que convertem na landing page"
+          />
+          <MetricCard
+            label="CPL Estimado com Ajustes"
+            value={`R$ ${cplEstimado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
+            variant={cplEstimado < custoLead ? "success" : "warning"}
+            description="Baseado em CTR e conversão"
+          />
+        </div>
+      </div>
+
+      {/* Resultados de Leads e Vendas */}
       <div className="grid gap-4 md:grid-cols-2">
         <MetricCard
-          label="Investimento em Captação"
-          value={`R$ ${(investimentoTotal * 0.7).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
-          variant="default"
-          description="70% do investimento total"
+          label="Número de Leads"
+          value={numeroLeads.toLocaleString('pt-BR')}
+          icon={<Target className="w-5 h-5" />}
+          variant="primary"
+          description="Total de leads gerados"
         />
         <MetricCard
-          label="Investimento Total em tráfego"
-          value={`R$ ${investimentoTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
-          icon={<DollarSign className="w-5 h-5" />}
+          label="Número de Vendas"
+          value={numeroVendas.toLocaleString('pt-BR')}
+          icon={<TrendingUp className="w-5 h-5" />}
           variant="primary"
+          description={`Com taxa de conversão de ${taxaConversao}%`}
         />
       </div>
 
-      {/* Resultados Finais */}
+      {/* Resultados Financeiros */}
       <div className="grid gap-4 md:grid-cols-3">
         <MetricCard
-          label="Faturamento Previsto"
+          label="Faturamento Bruto"
           value={`R$ ${faturamentoBruto.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
           icon={<DollarSign className="w-5 h-5" />}
           variant="success"
+          description="Receita total prevista"
         />
         <MetricCard
           label="Lucro Bruto"
-          value={`R$ ${lucro.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
+          value={`R$ ${lucroBruto.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
           icon={<TrendingUp className="w-5 h-5" />}
-          variant={lucro > 0 ? "success" : "warning"}
+          variant={lucroBruto > 0 ? "success" : "warning"}
+          description="Faturamento - Investimento"
         />
         <MetricCard
           label="ROAS"
           value={roas.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-          description={`Para cada R$ 1 investido, retorna R$ ${roas.toFixed(2)}`}
           variant={roas > 3 ? "success" : roas > 1.5 ? "primary" : "warning"}
+          description={`R$ ${roas.toFixed(2)} retornados por R$ 1 investido`}
         />
       </div>
     </div>
