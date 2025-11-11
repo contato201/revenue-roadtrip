@@ -29,7 +29,14 @@ export function InputCard({
   min = 0,
   className 
 }: InputCardProps) {
-  const formatValue = (val: number) => {
+  const [inputValue, setInputValue] = useState("");
+
+  useEffect(() => {
+    // Atualiza o valor exibido quando o valor externo muda
+    setInputValue(formatForDisplay(value));
+  }, [value, suffix]);
+
+  const formatForDisplay = (val: number) => {
     if (suffix === "%") {
       return val.toString().replace('.', ',');
     }
@@ -37,19 +44,45 @@ export function InputCard({
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const inputValue = e.target.value;
-    // Permite apenas números e vírgula
-    const sanitized = inputValue.replace(/[^\d,]/g, '');
+    let input = e.target.value;
     
-    // Converte vírgula para ponto e parse
-    const rawValue = sanitized.replace(',', '.');
-    const numValue = parseFloat(rawValue);
+    // Remove tudo exceto números e vírgula
+    input = input.replace(/[^\d,]/g, '');
     
-    // Atualiza apenas se for um número válido ou string vazia
-    if (!isNaN(numValue)) {
+    if (suffix === "%") {
+      // Para percentual: permite apenas uma vírgula e até 2 decimais
+      const parts = input.split(',');
+      if (parts.length > 2) {
+        input = parts[0] + ',' + parts.slice(1).join('');
+      }
+      if (parts[1] && parts[1].length > 2) {
+        input = parts[0] + ',' + parts[1].substring(0, 2);
+      }
+      setInputValue(input);
+      const numValue = parseFloat(input.replace(',', '.')) || 0;
       onChange(numValue);
-    } else if (sanitized === '') {
-      onChange(0);
+    } else {
+      // Para valores monetários: formata automaticamente com separadores
+      // Remove tudo exceto números
+      const onlyNumbers = input.replace(/\D/g, '');
+      
+      if (onlyNumbers === '') {
+        setInputValue('');
+        onChange(0);
+        return;
+      }
+      
+      // Converte para número (considerando os últimos 2 dígitos como centavos)
+      const numValue = parseFloat(onlyNumbers) / 100;
+      
+      // Formata para exibição
+      const formatted = numValue.toLocaleString('pt-BR', { 
+        minimumFractionDigits: 2, 
+        maximumFractionDigits: 2 
+      });
+      
+      setInputValue(formatted);
+      onChange(numValue);
     }
   };
 
@@ -68,7 +101,7 @@ export function InputCard({
           )}
           <Input
             type="text"
-            value={formatValue(value)}
+            value={inputValue}
             onChange={handleChange}
             className={cn(
               "h-12 text-lg font-semibold border-2 border-input focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all bg-background text-foreground",
