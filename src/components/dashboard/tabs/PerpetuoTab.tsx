@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { InputCard } from "../InputCard";
 import { MetricCard } from "../MetricCard";
+import { BenchmarkingCard } from "../BenchmarkingCard";
 import { TrendingUp, DollarSign, Target, Percent, MessageSquare, Calendar } from "lucide-react";
 
 export function PerpetuoTab() {
@@ -17,8 +18,20 @@ export function PerpetuoTab() {
   const roas = investimento > 0 ? faturamentoBruto / investimento : 0;
   const custoConversao = conversoes > 0 ? investimento / conversoes : 0;
 
+  const handleBenchmarksGenerated = (benchmarks: any) => {
+    if (benchmarks.custoMensagem) setCustoMensagem(benchmarks.custoMensagem);
+    if (benchmarks.taxaConversao) setTaxaConversao(benchmarks.taxaConversao);
+    if (benchmarks.ticket) setTicket(benchmarks.ticket);
+  };
+
   return (
     <div className="space-y-6">
+      {/* Benchmarking */}
+      <BenchmarkingCard 
+        tipo="perpetuo" 
+        onBenchmarksGenerated={handleBenchmarksGenerated}
+      />
+
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <InputCard
           label="Investimento Mensal"

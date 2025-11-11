@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { InputCard } from "../InputCard";
 import { MetricCard } from "../MetricCard";
+import { BenchmarkingCard } from "../BenchmarkingCard";
 import { Card } from "@/components/ui/card";
 import { TrendingUp, DollarSign, Users, Calendar, Target, Phone, UserPlus } from "lucide-react";
 
@@ -22,8 +23,22 @@ export function NegocioLocalTab() {
   const roi = investimento > 0 ? ((lucro / investimento) * 100) : 0;
   const cac = vendas > 0 ? (investimento / vendas) : 0;
 
+  const handleBenchmarksGenerated = (benchmarks: any) => {
+    if (benchmarks.custoLead) setCustoLead(benchmarks.custoLead);
+    if (benchmarks.taxaAgendamento) setTaxaAgendamento(benchmarks.taxaAgendamento);
+    if (benchmarks.taxaComparecimento) setTaxaComparecimento(benchmarks.taxaComparecimento);
+    if (benchmarks.taxaFechamento) setTaxaFechamento(benchmarks.taxaFechamento);
+    if (benchmarks.ticketMedio) setTicketMedio(benchmarks.ticketMedio);
+  };
+
   return (
     <div className="space-y-6">
+      {/* Benchmarking */}
+      <BenchmarkingCard 
+        tipo="local" 
+        onBenchmarksGenerated={handleBenchmarksGenerated}
+      />
+
       {/* Explicação Simples */}
       <Card className="p-6 bg-gradient-primary text-primary-foreground">
         <h3 className="text-xl font-bold mb-2">Como Funciona?</h3>

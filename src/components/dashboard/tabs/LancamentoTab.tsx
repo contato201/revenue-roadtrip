@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { InputCard } from "../InputCard";
 import { MetricCard } from "../MetricCard";
+import { BenchmarkingCard } from "../BenchmarkingCard";
 import { TrendingUp, DollarSign, Target, Percent, Users, BarChart3 } from "lucide-react";
 
 export function LancamentoTab() {
@@ -18,8 +19,20 @@ export function LancamentoTab() {
   const lucro = faturamentoLiquido - investimento;
   const roas = investimento > 0 ? faturamentoBruto / investimento : 0;
 
+  const handleBenchmarksGenerated = (benchmarks: any) => {
+    if (benchmarks.cpm) setCpm(benchmarks.cpm);
+    if (benchmarks.taxaConversao) setTaxaConversao(benchmarks.taxaConversao);
+    if (benchmarks.ticket) setTicket(benchmarks.ticket);
+  };
+
   return (
     <div className="space-y-6">
+      {/* Benchmarking */}
+      <BenchmarkingCard 
+        tipo="lancamento" 
+        onBenchmarksGenerated={handleBenchmarksGenerated}
+      />
+
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <InputCard
           label="Investimento"
