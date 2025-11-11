@@ -7,7 +7,7 @@ import { TrendingUp, DollarSign, Target, Percent, MousePointerClick } from "luci
 export function LancamentoTab() {
   // Inputs principais
   const [investimentoTotal, setInvestimentoTotal] = useState(1000);
-  const [custoLead, setCustoLead] = useState(30);
+  const [cplBase, setCplBase] = useState(30); // CPL de referência
   const [taxaConversao, setTaxaConversao] = useState(1.2); // Representa % diretamente (ex: 1.2 = 1.2%)
   const [ticket, setTicket] = useState(997);
   
@@ -17,6 +17,17 @@ export function LancamentoTab() {
   // Fatores que afetam o CPL (editáveis)
   const [ctr, setCtr] = useState(2.5);
   const [conversaoPagina, setConversaoPagina] = useState(15);
+
+  // Referências para o impacto no CPL
+  const ctrReferencia = 2.5; // CTR de referência (mercado)
+  const conversaoReferencia = 15; // Conversão de referência
+  
+  // CPL ajustado baseado nos fatores
+  // Se CTR aumenta, CPL diminui proporcionalmente
+  // Se conversão aumenta, CPL diminui proporcionalmente
+  const fatorCtr = ctrReferencia / ctr; // Se CTR dobra, fator é 0.5 (CPL cai pela metade)
+  const fatorConversao = conversaoReferencia / conversaoPagina;
+  const custoLead = cplBase * fatorCtr * fatorConversao;
 
   // Cálculos de investimento
   const investimentoCaptacao = investimentoTotal * (percentualCaptacao / 100);
@@ -31,11 +42,8 @@ export function LancamentoTab() {
   const lucroBruto = faturamentoBruto - investimentoTotal;
   const roas = investimentoTotal > 0 ? faturamentoBruto / investimentoTotal : 0;
 
-  // Cálculo de CPL estimado baseado em CTR e conversão da página
-  const cplEstimado = custoLead * (1 / (ctr / 100)) * (1 / (conversaoPagina / 100));
-
   const handleBenchmarksGenerated = (benchmarks: any) => {
-    if (benchmarks.custoLead) setCustoLead(benchmarks.custoLead);
+    if (benchmarks.custoLead) setCplBase(benchmarks.custoLead);
     if (benchmarks.ticket) setTicket(benchmarks.ticket);
     if (benchmarks.meta?.ctr) setCtr(benchmarks.meta.ctr);
   };
@@ -59,13 +67,13 @@ export function LancamentoTab() {
           description="Valor total do investimento"
         />
         <InputCard
-          label="CPL médio"
-          value={custoLead}
-          onChange={setCustoLead}
+          label="CPL Base de Referência"
+          value={cplBase}
+          onChange={setCplBase}
           prefix="R$"
           step={0.5}
           icon={<Target className="w-4 h-4" />}
-          description="Custo por lead"
+          description="CPL inicial sem otimizações"
         />
         <InputCard
           label="Taxa de Conversão"
@@ -117,10 +125,10 @@ export function LancamentoTab() {
       {/* Fatores que Afetam o CPL */}
       <div className="bg-card border-2 border-border rounded-lg p-6">
         <h3 className="text-lg font-display font-bold mb-4 text-foreground">
-          Fatores que Afetam o Custo por Lead
+          Como CTR e Conversão Afetam o CPL
         </h3>
         <p className="text-sm text-muted-foreground mb-4">
-          Ajuste CTR e taxa de conversão da página para ver como impactam o CPL estimado
+          Ajuste CTR e conversão da página para ver o impacto direto no custo por lead
         </p>
         <div className="grid gap-4 md:grid-cols-3">
           <InputCard
@@ -130,7 +138,7 @@ export function LancamentoTab() {
             suffix="%"
             step={0.1}
             icon={<MousePointerClick className="w-4 h-4" />}
-            description="% de pessoas que clicam"
+            description="↑ CTR = ↓ CPL (mais cliques por impressão)"
           />
           <InputCard
             label="Conversão da Página"
@@ -139,13 +147,13 @@ export function LancamentoTab() {
             suffix="%"
             step={0.5}
             icon={<Percent className="w-4 h-4" />}
-            description="% que convertem na landing page"
+            description="↑ Conversão = ↓ CPL (mais leads por clique)"
           />
           <MetricCard
-            label="CPL Estimado com Ajustes"
-            value={`R$ ${cplEstimado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
-            variant={cplEstimado < custoLead ? "success" : "warning"}
-            description="Baseado em CTR e conversão"
+            label="CPL Real Ajustado"
+            value={`R$ ${custoLead.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
+            variant={custoLead < cplBase ? "success" : custoLead > cplBase ? "warning" : "default"}
+            description={custoLead < cplBase ? `${(((cplBase - custoLead) / cplBase) * 100).toFixed(1)}% menor que o base` : custoLead > cplBase ? `${(((custoLead - cplBase) / cplBase) * 100).toFixed(1)}% maior que o base` : "Igual ao base"}
           />
         </div>
       </div>
