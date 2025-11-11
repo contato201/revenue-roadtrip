@@ -18,14 +18,15 @@ export function LancamentoTab() {
   const [ctr, setCtr] = useState(2.5);
   const [conversaoPagina, setConversaoPagina] = useState(15);
 
-  // Referências para o impacto no CPL
-  const ctrReferencia = 2.5; // CTR de referência (mercado)
-  const conversaoReferencia = 15; // Conversão de referência
+  // Referências para o impacto no CPL (100% de performance)
+  const ctrReferencia = 2.5; // CTR de referência (100% de performance)
+  const conversaoReferencia = 15; // Conversão de referência (100% de performance)
   
   // CPL ajustado baseado nos fatores
-  // Se CTR aumenta, CPL diminui proporcionalmente
-  // Se conversão aumenta, CPL diminui proporcionalmente
-  const fatorCtr = ctrReferencia / ctr; // Se CTR dobra, fator é 0.5 (CPL cai pela metade)
+  // Quando CTR e conversão estão na referência, CPL = cplBase
+  // Abaixo da referência, CPL aumenta (pior performance)
+  // Acima da referência, CPL diminui (melhor performance)
+  const fatorCtr = ctrReferencia / ctr;
   const fatorConversao = conversaoReferencia / conversaoPagina;
   const custoLead = cplBase * fatorCtr * fatorConversao;
 
