@@ -3,7 +3,6 @@ import { LancamentoTab } from "@/components/dashboard/tabs/LancamentoTab";
 import { PerpetuoTab } from "@/components/dashboard/tabs/PerpetuoTab";
 import { NegocioLocalTab } from "@/components/dashboard/tabs/NegocioLocalTab";
 import { Rocket, RefreshCw, Store, BarChart3 } from "lucide-react";
-import logoRT from "@/assets/logo-rt.jpg";
 
 const Index = () => {
   return (
@@ -13,12 +12,13 @@ const Index = () => {
         <div className="container mx-auto px-6 py-4 max-w-7xl">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <img 
-                src={logoRT} 
-                alt="Reproduzindo Talentos" 
-                className="h-12 object-contain"
-              />
-              <div className="border-l border-border pl-4">
+              <div className="flex items-center gap-2">
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <span className="text-primary font-display font-bold text-lg">RT</span>
+                </div>
+                <span className="text-foreground font-display font-semibold text-lg">Reproduzindo Talentos</span>
+              </div>
+              <div className="border-l border-border pl-4 ml-4">
                 <h1 className="text-2xl font-display font-semibold text-foreground tracking-tight">
                   Dashboard de Previsão
                 </h1>
