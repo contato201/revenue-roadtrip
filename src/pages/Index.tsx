@@ -3,23 +3,33 @@ import { LancamentoTab } from "@/components/dashboard/tabs/LancamentoTab";
 import { PerpetuoTab } from "@/components/dashboard/tabs/PerpetuoTab";
 import { NegocioLocalTab } from "@/components/dashboard/tabs/NegocioLocalTab";
 import { Rocket, RefreshCw, Store, BarChart3 } from "lucide-react";
+import logoRT from "@/assets/logo-rt.jpg";
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto py-8 px-4 max-w-7xl">
         <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-gradient-primary rounded-lg">
-              <BarChart3 className="w-6 h-6 text-primary-foreground" />
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-gradient-primary rounded-lg">
+                <BarChart3 className="w-6 h-6 text-primary-foreground" />
+              </div>
+              <div>
+                <h1 className="text-4xl font-bold text-foreground">
+                  Dashboard de Previsão
+                </h1>
+                <p className="text-muted-foreground">
+                  Simule e planeje seus investimentos em marketing digital
+                </p>
+              </div>
             </div>
-            <h1 className="text-4xl font-bold text-foreground">
-              Dashboard de Previsão
-            </h1>
+            <img 
+              src={logoRT} 
+              alt="Reproduzindo Talentos" 
+              className="h-16 object-contain"
+            />
           </div>
-          <p className="text-muted-foreground">
-            Simule e planeje seus investimentos em marketing digital
-          </p>
         </div>
 
         <Tabs defaultValue="local" className="space-y-6">

@@ -193,7 +193,7 @@ export function BenchmarkingCard({ tipo, onBenchmarksGenerated }: BenchmarkingCa
               </div>
             </Card>
 
-            {/* Meta Ads e Google Ads lado a lado */}
+            {/* Meta Ads e Google Ads lado a lado - Simplificado */}
             <div className="grid md:grid-cols-2 gap-4">
               {/* Meta Ads */}
               {kpis.meta && (
@@ -203,59 +203,44 @@ export function BenchmarkingCard({ tipo, onBenchmarksGenerated }: BenchmarkingCa
                       <div className="w-3 h-3 rounded-full bg-blue-500"></div>
                       <h4 className="text-lg font-bold text-foreground">Meta Ads</h4>
                     </div>
-                    
-                    <div className="p-3 bg-blue-500/10 rounded-lg">
-                      <p className="text-xs text-muted-foreground mb-1">Conversões potenciais</p>
-                      <p className="text-3xl font-bold text-blue-600">
-                        {kpis.meta.conversoesPotenciais}
-                      </p>
-                    </div>
 
                     <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">CPA médio:</span>
-                        <span className="font-semibold text-foreground">
-                          R$ {kpis.meta.custoAquisicaoCliente?.toFixed(2) || '—'}
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">CTR:</span>
-                        <span className="font-semibold text-foreground">
-                          {kpis.meta.ctr ? `${kpis.meta.ctr.toFixed(2)}%` : '—'}
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">CPC:</span>
-                        <span className="font-semibold text-foreground">
-                          R$ {kpis.meta.cpc?.toFixed(2) || '—'}
-                        </span>
-                      </div>
                       {kpis.meta.cpm && (
                         <div className="flex justify-between">
-                          <span className="text-muted-foreground">CPM:</span>
+                          <span className="text-muted-foreground">CPM do mercado:</span>
                           <span className="font-semibold text-foreground">
                             R$ {kpis.meta.cpm.toFixed(2)}
                           </span>
                         </div>
                       )}
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">CPC do mercado:</span>
+                        <span className="font-semibold text-foreground">
+                          R$ {kpis.meta.cpc?.toFixed(2) || '—'}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">CTR do mercado:</span>
+                        <span className="font-semibold text-foreground">
+                          {kpis.meta.ctr ? `${kpis.meta.ctr.toFixed(2)}%` : '—'}
+                        </span>
+                      </div>
                       {kpis.meta.custoLead && (
                         <div className="flex justify-between">
-                          <span className="text-muted-foreground">Custo por lead:</span>
+                          <span className="text-muted-foreground">CPL do mercado:</span>
                           <span className="font-semibold text-foreground">
                             R$ {kpis.meta.custoLead.toFixed(2)}
                           </span>
                         </div>
                       )}
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Impressões:</span>
-                        <span className="font-semibold text-foreground">
-                          {kpis.meta.impressoesPorLead 
-                            ? (kpis.meta.conversoesPotenciais * kpis.meta.impressoesPorLead).toLocaleString()
-                            : kpis.meta.impressoesPorConversao 
-                            ? (kpis.meta.conversoesPotenciais * kpis.meta.impressoesPorConversao).toLocaleString()
-                            : '—'}
-                        </span>
-                      </div>
+                      {kpis.meta.custoAquisicaoCliente && (
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">CPA médio do mercado:</span>
+                          <span className="font-semibold text-foreground">
+                            R$ {kpis.meta.custoAquisicaoCliente.toFixed(2)}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </Card>
@@ -269,59 +254,44 @@ export function BenchmarkingCard({ tipo, onBenchmarksGenerated }: BenchmarkingCa
                       <div className="w-3 h-3 rounded-full bg-green-500"></div>
                       <h4 className="text-lg font-bold text-foreground">Google Ads</h4>
                     </div>
-                    
-                    <div className="p-3 bg-green-500/10 rounded-lg">
-                      <p className="text-xs text-muted-foreground mb-1">Conversões potenciais</p>
-                      <p className="text-3xl font-bold text-green-600">
-                        {kpis.google.conversoesPotenciais}
-                      </p>
-                    </div>
 
                     <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">CPA médio:</span>
-                        <span className="font-semibold text-foreground">
-                          R$ {kpis.google.custoAquisicaoCliente?.toFixed(2) || '—'}
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">CTR:</span>
-                        <span className="font-semibold text-foreground">
-                          {kpis.google.ctr ? `${kpis.google.ctr.toFixed(2)}%` : '—'}
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">CPC:</span>
-                        <span className="font-semibold text-foreground">
-                          R$ {kpis.google.cpc?.toFixed(2) || '—'}
-                        </span>
-                      </div>
                       {kpis.google.cpm && (
                         <div className="flex justify-between">
-                          <span className="text-muted-foreground">CPM:</span>
+                          <span className="text-muted-foreground">CPM do mercado:</span>
                           <span className="font-semibold text-foreground">
                             R$ {kpis.google.cpm.toFixed(2)}
                           </span>
                         </div>
                       )}
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">CPC do mercado:</span>
+                        <span className="font-semibold text-foreground">
+                          R$ {kpis.google.cpc?.toFixed(2) || '—'}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">CTR do mercado:</span>
+                        <span className="font-semibold text-foreground">
+                          {kpis.google.ctr ? `${kpis.google.ctr.toFixed(2)}%` : '—'}
+                        </span>
+                      </div>
                       {kpis.google.custoLead && (
                         <div className="flex justify-between">
-                          <span className="text-muted-foreground">Custo por lead:</span>
+                          <span className="text-muted-foreground">CPL do mercado:</span>
                           <span className="font-semibold text-foreground">
                             R$ {kpis.google.custoLead.toFixed(2)}
                           </span>
                         </div>
                       )}
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Impressões:</span>
-                        <span className="font-semibold text-foreground">
-                          {kpis.google.impressoesPorLead 
-                            ? (kpis.google.conversoesPotenciais * kpis.google.impressoesPorLead).toLocaleString()
-                            : kpis.google.impressoesPorConversao 
-                            ? (kpis.google.conversoesPotenciais * kpis.google.impressoesPorConversao).toLocaleString()
-                            : '—'}
-                        </span>
-                      </div>
+                      {kpis.google.custoAquisicaoCliente && (
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">CPA médio do mercado:</span>
+                          <span className="font-semibold text-foreground">
+                            R$ {kpis.google.custoAquisicaoCliente.toFixed(2)}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </Card>

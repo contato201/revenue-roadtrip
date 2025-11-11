@@ -43,11 +43,13 @@ export function InputCard({
             </span>
           )}
           <Input
-            type="number"
-            value={value}
-            onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
-            step={step}
-            min={min}
+            type="text"
+            value={value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            onChange={(e) => {
+              const rawValue = e.target.value.replace(/\./g, '').replace(',', '.');
+              const numValue = parseFloat(rawValue) || 0;
+              onChange(numValue);
+            }}
             className={cn(
               "h-12 text-lg font-semibold border-2 focus:border-primary transition-smooth",
               prefix && "pl-10",

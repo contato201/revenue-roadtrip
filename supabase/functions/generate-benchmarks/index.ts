@@ -34,14 +34,12 @@ Seja ESPECÍFICO com números baseados em dados reais de campanhas. RETORNE DADO
 Calcule também o POTENCIAL DE CONVERSÕES para um investimento de exemplo (R$ 3.000) PARA CADA PLATAFORMA.`,
       
       lancamento: `Você é um especialista em lançamentos digitais no Brasil com acesso a dados de Meta Ads e Google Ads.
-Analise o segmento e produto fornecidos e retorne benchmarks REALISTAS SEPARADOS para Meta Ads e Google Ads.
-Use métricas reais de CPM, CPC, CTR para o nicho específico. Seja preciso com os números. RETORNE DADOS SEPARADOS PARA META E GOOGLE.
-Calcule também o POTENCIAL DE CONVERSÕES para um investimento de exemplo (R$ 5.000) PARA CADA PLATAFORMA.`,
+Analise o segmento e produto fornecidos e retorne APENAS as métricas ESSENCIAIS de mercado SEPARADAS para Meta Ads e Google Ads.
+RETORNE DADOS SIMPLIFICADOS: CPM, CPC, CTR e CPL (custo por lead) para cada plataforma.`,
       
       perpetuo: `Você é um especialista em negócios perpétuos no Brasil com acesso a dados de Meta Ads e Google Ads.
-Analise o segmento e produto fornecidos e retorne benchmarks REALISTAS SEPARADOS para Meta Ads e Google Ads.
-Use dados reais de custo por lead, CPC médio, CTR típico do nicho. Seja específico. RETORNE DADOS SEPARADOS PARA META E GOOGLE.
-Calcule também o POTENCIAL DE CONVERSÕES para um investimento de exemplo (R$ 3.000) PARA CADA PLATAFORMA.`
+Analise o segmento e produto fornecidos e retorne APENAS as métricas ESSENCIAIS de mercado SEPARADAS para Meta Ads e Google Ads.
+RETORNE DADOS SIMPLIFICADOS: CPM, CPC, CTR e CPA médio (custo por aquisição) para cada plataforma.`
     };
 
     const userPrompts = {
@@ -56,16 +54,16 @@ Inclua para cada plataforma: CPC médio, CTR esperado, custo por lead realista, 
       lancamento: `Segmento: ${segmento}
 Produto/Serviço: ${produto}
 
-Forneça KPIs REAIS SEPARADOS de Meta Ads e Google Ads para lançamento deste produto.
-RETORNE DOIS CONJUNTOS COMPLETOS DE DADOS: um para Meta Ads e outro para Google Ads.
-Inclua para cada plataforma: CPM médio do nicho, CPC, CTR, taxa de conversão realista para landing pages de lançamento.`,
+Forneça APENAS as métricas ESSENCIAIS de mercado SEPARADAS de Meta Ads e Google Ads para lançamento deste produto.
+RETORNE DOIS CONJUNTOS SIMPLIFICADOS: um para Meta Ads e outro para Google Ads.
+Inclua para cada plataforma SOMENTE: CPM médio, CPC médio, CTR médio, CPL médio (custo por lead).`,
       
       perpetuo: `Segmento: ${segmento}
 Produto/Serviço: ${produto}
 
-Forneça KPIs REAIS SEPARADOS de Meta Ads e Google Ads para tráfego pago perpétuo para este produto.
-RETORNE DOIS CONJUNTOS COMPLETOS DE DADOS: um para Meta Ads e outro para Google Ads.
-Inclua para cada plataforma: custo por mensagem/lead, CPC médio, CTR, taxa de conversão para funil evergreen.`
+Forneça APENAS as métricas ESSENCIAIS de mercado SEPARADAS de Meta Ads e Google Ads para tráfego pago perpétuo.
+RETORNE DOIS CONJUNTOS SIMPLIFICADOS: um para Meta Ads e outro para Google Ads.
+Inclua para cada plataforma SOMENTE: CPM médio, CPC médio, CTR médio, CPA médio (custo por aquisição).`
     };
 
     const tools = {
@@ -119,42 +117,35 @@ Inclua para cada plataforma: custo por mensagem/lead, CPC médio, CTR, taxa de c
         type: "function",
         function: {
           name: "retornar_benchmarks_lancamento",
-          description: "Retorna benchmarks separados de Meta Ads e Google Ads para lançamento",
+          description: "Retorna benchmarks simplificados de Meta Ads e Google Ads para lançamento",
           parameters: {
             type: "object",
             properties: {
               meta: {
                 type: "object",
-                description: "Benchmarks específicos do Meta Ads",
+                description: "Benchmarks do Meta Ads",
                 properties: {
-                  cpm: { type: "number", description: "CPM médio em R$ no Meta" },
-                  cpc: { type: "number", description: "CPC médio em R$ no Meta" },
-                  ctr: { type: "number", description: "CTR médio em % no Meta" },
-                  impressoesPorConversao: { type: "number", description: "Impressões para 1 conversão no Meta" },
-                  conversoesPotenciais: { type: "number", description: "Conversões potenciais no Meta" },
-                  custoAquisicaoCliente: { type: "number", description: "CPA no Meta em R$" }
+                  cpm: { type: "number", description: "CPM médio em R$" },
+                  cpc: { type: "number", description: "CPC médio em R$" },
+                  ctr: { type: "number", description: "CTR médio em %" },
+                  custoLead: { type: "number", description: "CPL médio em R$" }
                 },
-                required: ["cpm", "cpc", "ctr", "impressoesPorConversao", "conversoesPotenciais", "custoAquisicaoCliente"]
+                required: ["cpm", "cpc", "ctr", "custoLead"]
               },
               google: {
                 type: "object",
-                description: "Benchmarks específicos do Google Ads",
+                description: "Benchmarks do Google Ads",
                 properties: {
-                  cpm: { type: "number", description: "CPM médio em R$ no Google" },
-                  cpc: { type: "number", description: "CPC médio em R$ no Google" },
-                  ctr: { type: "number", description: "CTR médio em % no Google" },
-                  impressoesPorConversao: { type: "number", description: "Impressões para 1 conversão no Google" },
-                  conversoesPotenciais: { type: "number", description: "Conversões potenciais no Google" },
-                  custoAquisicaoCliente: { type: "number", description: "CPA no Google em R$" }
+                  cpm: { type: "number", description: "CPM médio em R$" },
+                  cpc: { type: "number", description: "CPC médio em R$" },
+                  ctr: { type: "number", description: "CTR médio em %" },
+                  custoLead: { type: "number", description: "CPL médio em R$" }
                 },
-                required: ["cpm", "cpc", "ctr", "impressoesPorConversao", "conversoesPotenciais", "custoAquisicaoCliente"]
+                required: ["cpm", "cpc", "ctr", "custoLead"]
               },
-              taxaConversao: { type: "number", description: "Taxa de conversão média em %" },
-              ticket: { type: "number", description: "Ticket médio em R$" },
-              investimentoExemplo: { type: "number", description: "Valor do investimento (5000)" },
-              explicacao: { type: "string", description: "Explicação dos KPIs" }
+              explicacao: { type: "string", description: "Breve explicação dos benchmarks" }
             },
-            required: ["meta", "google", "taxaConversao", "ticket", "investimentoExemplo", "explicacao"],
+            required: ["meta", "google", "explicacao"],
             additionalProperties: false
           }
         }
@@ -163,42 +154,35 @@ Inclua para cada plataforma: custo por mensagem/lead, CPC médio, CTR, taxa de c
         type: "function",
         function: {
           name: "retornar_benchmarks_perpetuo",
-          description: "Retorna benchmarks separados de Meta Ads e Google Ads para negócio perpétuo",
+          description: "Retorna benchmarks simplificados de Meta Ads e Google Ads para negócio perpétuo",
           parameters: {
             type: "object",
             properties: {
               meta: {
                 type: "object",
-                description: "Benchmarks específicos do Meta Ads",
+                description: "Benchmarks do Meta Ads",
                 properties: {
-                  cpc: { type: "number", description: "CPC médio em R$ no Meta" },
-                  ctr: { type: "number", description: "CTR médio em % no Meta" },
-                  custoMensagem: { type: "number", description: "Custo por mensagem/lead em R$ no Meta" },
-                  cliquesParaConversao: { type: "number", description: "Cliques para 1 conversão no Meta" },
-                  conversoesPotenciais: { type: "number", description: "Conversões potenciais no Meta" },
-                  custoAquisicaoCliente: { type: "number", description: "CPA no Meta em R$" }
+                  cpm: { type: "number", description: "CPM médio em R$" },
+                  cpc: { type: "number", description: "CPC médio em R$" },
+                  ctr: { type: "number", description: "CTR médio em %" },
+                  custoAquisicaoCliente: { type: "number", description: "CPA médio em R$" }
                 },
-                required: ["cpc", "ctr", "custoMensagem", "cliquesParaConversao", "conversoesPotenciais", "custoAquisicaoCliente"]
+                required: ["cpm", "cpc", "ctr", "custoAquisicaoCliente"]
               },
               google: {
                 type: "object",
-                description: "Benchmarks específicos do Google Ads",
+                description: "Benchmarks do Google Ads",
                 properties: {
-                  cpc: { type: "number", description: "CPC médio em R$ no Google" },
-                  ctr: { type: "number", description: "CTR médio em % no Google" },
-                  custoMensagem: { type: "number", description: "Custo por mensagem/lead em R$ no Google" },
-                  cliquesParaConversao: { type: "number", description: "Cliques para 1 conversão no Google" },
-                  conversoesPotenciais: { type: "number", description: "Conversões potenciais no Google" },
-                  custoAquisicaoCliente: { type: "number", description: "CPA no Google em R$" }
+                  cpm: { type: "number", description: "CPM médio em R$" },
+                  cpc: { type: "number", description: "CPC médio em R$" },
+                  ctr: { type: "number", description: "CTR médio em %" },
+                  custoAquisicaoCliente: { type: "number", description: "CPA médio em R$" }
                 },
-                required: ["cpc", "ctr", "custoMensagem", "cliquesParaConversao", "conversoesPotenciais", "custoAquisicaoCliente"]
+                required: ["cpm", "cpc", "ctr", "custoAquisicaoCliente"]
               },
-              taxaConversao: { type: "number", description: "Taxa de conversão média em %" },
-              ticket: { type: "number", description: "Ticket médio em R$" },
-              investimentoExemplo: { type: "number", description: "Valor do investimento (3000)" },
-              explicacao: { type: "string", description: "Explicação dos KPIs" }
+              explicacao: { type: "string", description: "Breve explicação dos benchmarks" }
             },
-            required: ["meta", "google", "taxaConversao", "ticket", "investimentoExemplo", "explicacao"],
+            required: ["meta", "google", "explicacao"],
             additionalProperties: false
           }
         }
