@@ -31,10 +31,10 @@ export function InputCard({
 }: InputCardProps) {
   return (
     <Card className={cn("p-5 border-2 border-border hover:border-primary/30 transition-all shadow-sm hover:shadow-md bg-card", className)}>
-      <div className="space-y-3">
-        <div className="flex items-center gap-2">
-          {icon && <div className="text-muted-foreground">{icon}</div>}
-          <Label className="text-sm font-medium text-foreground">{label}</Label>
+      <div className="space-y-4">
+        <div className="flex items-center gap-2.5">
+          {icon && <div className="text-primary">{icon}</div>}
+          <Label className="text-base font-display font-semibold text-foreground tracking-tight">{label}</Label>
         </div>
         <div className="relative">
           {prefix && (

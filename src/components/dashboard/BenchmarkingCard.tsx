@@ -96,8 +96,8 @@ export function BenchmarkingCard({ tipo, onBenchmarksGenerated }: BenchmarkingCa
             <Sparkles className="w-5 h-5 text-primary" />
           </div>
           <div>
-            <h3 className="text-lg font-display font-semibold text-foreground">Benchmarking Inteligente</h3>
-            <p className="text-sm text-muted-foreground">
+            <h3 className="text-xl font-display font-bold text-foreground tracking-tight">Benchmarking Inteligente</h3>
+            <p className="text-sm text-muted-foreground font-medium">
               IA sugere valores baseados no seu mercado
             </p>
           </div>
@@ -106,7 +106,7 @@ export function BenchmarkingCard({ tipo, onBenchmarksGenerated }: BenchmarkingCa
         <div className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="segmento" className="text-sm font-semibold">
+              <Label htmlFor="segmento" className="text-base font-display font-semibold text-foreground">
                 Segmento / Nicho *
               </Label>
               <Input
@@ -120,7 +120,7 @@ export function BenchmarkingCard({ tipo, onBenchmarksGenerated }: BenchmarkingCa
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="produto" className="text-sm font-semibold">
+              <Label htmlFor="produto" className="text-base font-display font-semibold text-foreground">
                 Produto / Serviço *
               </Label>
               <Input
@@ -136,7 +136,7 @@ export function BenchmarkingCard({ tipo, onBenchmarksGenerated }: BenchmarkingCa
 
           {tipo === "local" && (
             <div className="space-y-2">
-              <Label htmlFor="regiao" className="text-sm font-semibold">
+              <Label htmlFor="regiao" className="text-base font-display font-semibold text-foreground">
                 Região de Atuação *
               </Label>
               <Input

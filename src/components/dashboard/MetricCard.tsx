@@ -26,9 +26,9 @@ export function MetricCard({
     )}>
       <div className="flex items-start justify-between">
         <div className="flex-1">
-          <p className="text-sm font-medium text-muted-foreground mb-2">{label}</p>
+          <p className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wider">{label}</p>
           <p className={cn(
-            "text-2xl font-display font-semibold",
+            "text-3xl font-display font-bold",
             variant === "success" && "text-success",
             variant === "warning" && "text-warning",
             variant === "primary" && "text-primary",
