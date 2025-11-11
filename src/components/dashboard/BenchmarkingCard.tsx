@@ -170,56 +170,105 @@ export function BenchmarkingCard({ tipo, onBenchmarksGenerated }: BenchmarkingCa
         </Button>
 
         {kpis && (
-          <div className="space-y-3">
-            {/* KPIs de Anúncios */}
-            <Card className="p-4 bg-primary/5 border-primary/20">
-              <p className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 text-primary" />
-                KPIs de Anúncios Online:
-              </p>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-                {kpis.cpc && (
-                  <div>
-                    <p className="text-muted-foreground">CPC Médio</p>
-                    <p className="font-bold text-foreground">R$ {kpis.cpc.toFixed(2)}</p>
-                  </div>
-                )}
-                {kpis.ctr && (
-                  <div>
-                    <p className="text-muted-foreground">CTR Médio</p>
-                    <p className="font-bold text-foreground">{kpis.ctr.toFixed(2)}%</p>
-                  </div>
-                )}
-                {kpis.cpm && (
-                  <div>
-                    <p className="text-muted-foreground">CPM Médio</p>
-                    <p className="font-bold text-foreground">R$ {kpis.cpm.toFixed(2)}</p>
-                  </div>
-                )}
-                {kpis.impressoesPorLead && (
-                  <div>
-                    <p className="text-muted-foreground">Impressões/Lead</p>
-                    <p className="font-bold text-foreground">{kpis.impressoesPorLead.toLocaleString()}</p>
-                  </div>
-                )}
-                {kpis.impressoesPorConversao && (
-                  <div>
-                    <p className="text-muted-foreground">Impressões/Venda</p>
-                    <p className="font-bold text-foreground">{kpis.impressoesPorConversao.toLocaleString()}</p>
-                  </div>
-                )}
-                {kpis.cliquesParaConversao && (
-                  <div>
-                    <p className="text-muted-foreground">Cliques/Venda</p>
-                    <p className="font-bold text-foreground">{kpis.cliquesParaConversao}</p>
+          <div className="space-y-4 mt-6">
+            {/* Potencial de Conversões - Estilo Google Ads */}
+            <Card className="p-6 bg-gradient-to-r from-primary/10 to-accent/10 border-2 border-primary/30">
+              <div className="space-y-3">
+                <p className="text-base text-foreground">
+                  Seu plano pode gerar até{" "}
+                  <span className="text-2xl font-bold text-primary mx-1">
+                    {kpis.conversoesPotenciais}
+                  </span>{" "}
+                  conversões por{" "}
+                  <span className="text-xl font-bold text-foreground">
+                    R$ {kpis.investimentoExemplo?.toLocaleString() || '0'}
+                  </span>
+                  , com um orçamento médio diário de{" "}
+                  <span className="font-bold text-foreground">
+                    R$ {((kpis.investimentoExemplo || 0) / 30).toFixed(0)}
+                  </span>
+                </p>
+                
+                <div className="flex gap-4 text-sm text-muted-foreground">
+                  {kpis.taxaConversao && (
+                    <span>
+                      Taxa de conversão: <strong className="text-foreground">{kpis.taxaConversao.toFixed(2)}%</strong>
+                    </span>
+                  )}
+                  {kpis.custoAquisicaoCliente && (
+                    <span>
+                      Custo por conversão: <strong className="text-foreground">R$ {kpis.custoAquisicaoCliente.toFixed(2)}</strong>
+                    </span>
+                  )}
+                </div>
+
+                {kpis.fonteDados && (
+                  <div className="pt-3 border-t border-border/50">
+                    <p className="text-xs text-muted-foreground">
+                      <span className="font-semibold text-foreground">Fonte dos dados:</span> {kpis.fonteDados}
+                    </p>
                   </div>
                 )}
               </div>
             </Card>
 
+            {/* Tabela de KPIs - Estilo Google Ads */}
+            <Card className="p-4 bg-card border-border/50">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-border">
+                      <th className="text-left text-xs font-semibold text-muted-foreground pb-2">Conversões</th>
+                      <th className="text-left text-xs font-semibold text-muted-foreground pb-2">CPA médio</th>
+                      <th className="text-left text-xs font-semibold text-muted-foreground pb-2">ROAS</th>
+                      <th className="text-left text-xs font-semibold text-muted-foreground pb-2">CTR</th>
+                      <th className="text-left text-xs font-semibold text-muted-foreground pb-2">CPC méd.</th>
+                      {kpis.cpm && (
+                        <th className="text-left text-xs font-semibold text-muted-foreground pb-2">CPM</th>
+                      )}
+                      <th className="text-left text-xs font-semibold text-muted-foreground pb-2">Impressões</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td className="pt-3 text-2xl font-bold text-foreground">
+                        {kpis.conversoesPotenciais}
+                      </td>
+                      <td className="pt-3 text-base font-semibold text-foreground">
+                        R$ {kpis.custoAquisicaoCliente?.toFixed(2) || '—'}
+                      </td>
+                      <td className="pt-3 text-base font-semibold text-foreground">
+                        {kpis.ticket && kpis.custoAquisicaoCliente 
+                          ? (kpis.ticket / kpis.custoAquisicaoCliente).toFixed(2) 
+                          : '—'}
+                      </td>
+                      <td className="pt-3 text-base font-semibold text-foreground">
+                        {kpis.ctr ? `${kpis.ctr.toFixed(2)}%` : '—'}
+                      </td>
+                      <td className="pt-3 text-base font-semibold text-foreground">
+                        R$ {kpis.cpc?.toFixed(2) || '—'}
+                      </td>
+                      {kpis.cpm && (
+                        <td className="pt-3 text-base font-semibold text-foreground">
+                          R$ {kpis.cpm.toFixed(2)}
+                        </td>
+                      )}
+                      <td className="pt-3 text-base font-semibold text-foreground">
+                        {kpis.impressoesPorConversao 
+                          ? (kpis.conversoesPotenciais * kpis.impressoesPorConversao).toLocaleString()
+                          : kpis.impressoesPorLead 
+                          ? (kpis.conversoesPotenciais * kpis.impressoesPorLead * 3).toLocaleString()
+                          : '—'}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </Card>
+
             {/* Análise */}
             {explicacao && (
-              <Card className="p-4 bg-accent/10 border-accent/30">
+              <Card className="p-4 bg-accent/5 border-accent/30">
                 <div className="flex gap-2">
                   <TrendingUp className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
                   <div>

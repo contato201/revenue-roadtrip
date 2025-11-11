@@ -27,18 +27,21 @@ serve(async (req) => {
 
     // Sistema de prompts diferente para cada tipo
     const systemPrompts = {
-      local: `Você é um especialista em marketing digital para negócios locais no Brasil com dados de Meta Ads e Google Ads. 
+      local: `Você é um especialista em marketing digital para negócios locais no Brasil com acesso a dados de Meta Ads e Google Ads. 
 Analise o segmento, produto/serviço e região fornecidos e retorne benchmarks REALISTAS de anúncios online.
 Use dados reais do mercado brasileiro considerando: custo de vida da região, competição no segmento, comportamento digital local.
-Seja ESPECÍFICO com números baseados em dados reais de campanhas.`,
+Seja ESPECÍFICO com números baseados em dados reais de campanhas Meta e Google.
+Calcule também o POTENCIAL DE CONVERSÕES para um investimento de exemplo (R$ 3.000).`,
       
-      lancamento: `Você é um especialista em lançamentos digitais no Brasil com expertise em Meta Ads e Google Ads.
+      lancamento: `Você é um especialista em lançamentos digitais no Brasil com acesso a dados de Meta Ads e Google Ads.
 Analise o segmento e produto fornecidos e retorne benchmarks REALISTAS baseados em dados reais de mercado.
-Use métricas reais de CPM, CPC, CTR para o nicho específico. Seja preciso com os números.`,
+Use métricas reais de CPM, CPC, CTR para o nicho específico. Seja preciso com os números.
+Calcule também o POTENCIAL DE CONVERSÕES para um investimento de exemplo (R$ 5.000).`,
       
-      perpetuo: `Você é um especialista em negócios perpétuos no Brasil com expertise em Meta Ads e Google Ads.
+      perpetuo: `Você é um especialista em negócios perpétuos no Brasil com acesso a dados de Meta Ads e Google Ads.
 Analise o segmento e produto fornecidos e retorne benchmarks REALISTAS de tráfego pago contínuo.
-Use dados reais de custo por lead, CPC médio, CTR típico do nicho. Seja específico.`
+Use dados reais de custo por lead, CPC médio, CTR típico do nicho. Seja específico.
+Calcule também o POTENCIAL DE CONVERSÕES para um investimento de exemplo (R$ 3.000).`
     };
 
     const userPrompts = {
@@ -103,12 +106,28 @@ Inclua: custo por mensagem/lead, CPC médio, CTR, taxa de conversão para funil 
                 type: "number",
                 description: "Número aproximado de impressões necessárias para gerar 1 lead"
               },
+              conversoesPotenciais: {
+                type: "number",
+                description: "Quantidade potencial de vendas com R$ 3.000 de investimento"
+              },
+              investimentoExemplo: {
+                type: "number",
+                description: "Valor do investimento usado no exemplo (3000)"
+              },
+              custoAquisicaoCliente: {
+                type: "number",
+                description: "CAC - Custo para adquirir 1 cliente (em R$)"
+              },
+              fonteDados: {
+                type: "string",
+                description: "Fonte dos benchmarks (ex: 'Meta Ads (Brasil 2024-2025) e Google Ads (dados setoriais)')"
+              },
               explicacao: {
                 type: "string",
                 description: "Explicação detalhada sobre os KPIs baseados em dados da região e produto"
               }
             },
-            required: ["cpc", "ctr", "custoLead", "taxaAgendamento", "taxaComparecimento", "taxaFechamento", "ticketMedio", "impressoesPorLead", "explicacao"],
+            required: ["cpc", "ctr", "custoLead", "taxaAgendamento", "taxaComparecimento", "taxaFechamento", "ticketMedio", "impressoesPorLead", "conversoesPotenciais", "investimentoExemplo", "custoAquisicaoCliente", "fonteDados", "explicacao"],
             additionalProperties: false
           }
         }
@@ -145,12 +164,28 @@ Inclua: custo por mensagem/lead, CPC médio, CTR, taxa de conversão para funil 
                 type: "number",
                 description: "Número aproximado de impressões para gerar 1 conversão"
               },
+              conversoesPotenciais: {
+                type: "number",
+                description: "Quantidade potencial de conversões com R$ 5.000 de investimento"
+              },
+              investimentoExemplo: {
+                type: "number",
+                description: "Valor do investimento usado no exemplo (5000)"
+              },
+              custoAquisicaoCliente: {
+                type: "number",
+                description: "CPA - Custo por aquisição (em R$)"
+              },
+              fonteDados: {
+                type: "string",
+                description: "Fonte dos benchmarks (ex: 'Meta Ads e Google Ads - Mercado de Infoprodutos BR 2024-2025')"
+              },
               explicacao: {
                 type: "string",
                 description: "Explicação detalhada sobre os KPIs baseados em dados do nicho e produto"
               }
             },
-            required: ["cpm", "cpc", "ctr", "taxaConversao", "ticket", "impressoesPorConversao", "explicacao"],
+            required: ["cpm", "cpc", "ctr", "taxaConversao", "ticket", "impressoesPorConversao", "conversoesPotenciais", "investimentoExemplo", "custoAquisicaoCliente", "fonteDados", "explicacao"],
             additionalProperties: false
           }
         }
@@ -187,12 +222,28 @@ Inclua: custo por mensagem/lead, CPC médio, CTR, taxa de conversão para funil 
                 type: "number",
                 description: "Número médio de cliques necessários para 1 conversão"
               },
+              conversoesPotenciais: {
+                type: "number",
+                description: "Quantidade potencial de conversões com R$ 3.000 de investimento"
+              },
+              investimentoExemplo: {
+                type: "number",
+                description: "Valor do investimento usado no exemplo (3000)"
+              },
+              custoAquisicaoCliente: {
+                type: "number",
+                description: "CPA - Custo por aquisição (em R$)"
+              },
+              fonteDados: {
+                type: "string",
+                description: "Fonte dos benchmarks (ex: 'Meta Ads e Google Ads - E-commerce e Serviços Digitais BR 2024-2025')"
+              },
               explicacao: {
                 type: "string",
                 description: "Explicação detalhada sobre os KPIs baseados em dados do nicho e produto"
               }
             },
-            required: ["cpc", "ctr", "custoMensagem", "taxaConversao", "ticket", "cliquesParaConversao", "explicacao"],
+            required: ["cpc", "ctr", "custoMensagem", "taxaConversao", "ticket", "cliquesParaConversao", "conversoesPotenciais", "investimentoExemplo", "custoAquisicaoCliente", "fonteDados", "explicacao"],
             additionalProperties: false
           }
         }
