@@ -58,8 +58,17 @@ export function InputCard({
       if (parts[1] && parts[1].length > 2) {
         input = parts[0] + ',' + parts[1].substring(0, 2);
       }
-      setInputValue(input);
+      
       const numValue = parseFloat(input.replace(',', '.')) || 0;
+      
+      // Limitar a 100% para evitar valores absurdos
+      if (numValue > 100) {
+        setInputValue('100');
+        onChange(100);
+        return;
+      }
+      
+      setInputValue(input);
       onChange(numValue);
     } else {
       // Para valores monetários: formata automaticamente com separadores

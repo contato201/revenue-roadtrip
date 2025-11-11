@@ -8,7 +8,7 @@ export function LancamentoTab() {
   // Inputs principais
   const [investimentoTotal, setInvestimentoTotal] = useState(1000);
   const [custoLead, setCustoLead] = useState(30);
-  const [taxaConversao, setTaxaConversao] = useState(1.2);
+  const [taxaConversao, setTaxaConversao] = useState(1.2); // Representa % diretamente (ex: 1.2 = 1.2%)
   const [ticket, setTicket] = useState(997);
   
   // Percentual de captação
@@ -74,7 +74,7 @@ export function LancamentoTab() {
           suffix="%"
           step={0.1}
           icon={<Percent className="w-4 h-4" />}
-          description="% de leads que convertem"
+          description="% de leads que convertem em vendas (ex: 1.2%)"
         />
         <InputCard
           label="Ticket Médio"
