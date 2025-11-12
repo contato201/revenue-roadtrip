@@ -27,26 +27,71 @@ export function LancamentoTab() {
   // Abaixo da referência, CPL aumenta (pior performance)
   // Acima da referência, CPL diminui (melhor performance)
   const fatorCtr = ctrReferencia / ctr;
-  const fatorConversao = 100 / conversaoPagina;
+  const fatorConversao = conversaoReferencia / conversaoPagina; // CORRIGIDO: era 100 / conversaoPagina
   const custoLead = cplBase * fatorCtr * fatorConversao;
+  
+  console.log("[Lancamento] Cálculo CPL:", { 
+    cplBase, 
+    ctr, 
+    conversaoPagina, 
+    fatorCtr: fatorCtr.toFixed(2), 
+    fatorConversao: fatorConversao.toFixed(2), 
+    custoLead: custoLead.toFixed(2) 
+  });
 
-  // Cálculos de investimento
+  // Cálculos de investimento com validação
   const investimentoCaptacao = investimentoTotal * (percentualCaptacao / 100);
   const investimentoOutros = investimentoTotal - investimentoCaptacao;
 
-  // Cálculos de leads e vendas
-  const numeroLeads = Math.round(investimentoTotal / custoLead);
-  const numeroVendas = Math.round(numeroLeads * (taxaConversao / 100));
+  // Cálculos de leads e vendas com validações
+  const numeroLeads = investimentoTotal > 0 && custoLead > 0 
+    ? Math.round(investimentoTotal / custoLead) 
+    : 0;
+  const numeroVendas = numeroLeads > 0 && taxaConversao > 0 
+    ? Math.round(numeroLeads * (taxaConversao / 100)) 
+    : 0;
   
-  // Cálculos financeiros
-  const faturamentoBruto = numeroVendas * ticket;
+  // Cálculos financeiros com validações
+  const faturamentoBruto = numeroVendas > 0 && ticket > 0 
+    ? numeroVendas * ticket 
+    : 0;
   const lucroBruto = faturamentoBruto - investimentoTotal;
-  const roas = investimentoTotal > 0 ? faturamentoBruto / investimentoTotal : 0;
+  const roas = investimentoTotal > 0 
+    ? faturamentoBruto / investimentoTotal 
+    : 0;
+  
+  console.log("[Lancamento] Resultados:", { 
+    investimentoTotal, 
+    custoLead: custoLead.toFixed(2), 
+    numeroLeads, 
+    numeroVendas, 
+    faturamentoBruto, 
+    lucroBruto, 
+    roas: roas.toFixed(2) 
+  });
 
   const handleBenchmarksGenerated = (benchmarks: any) => {
-    if (benchmarks.custoLead) setCplBase(benchmarks.custoLead);
-    if (benchmarks.ticket) setTicket(benchmarks.ticket);
-    if (benchmarks.meta?.ctr) setCtr(benchmarks.meta.ctr);
+    console.log("[Lancamento] Benchmarks recebidos:", benchmarks);
+    
+    // Usa média entre Meta e Google para CPL, ou pega o que estiver disponível
+    const custoLeadMeta = benchmarks.meta?.custoLead;
+    const custoLeadGoogle = benchmarks.google?.custoLead;
+    const custoLeadMedio = custoLeadMeta && custoLeadGoogle 
+      ? (custoLeadMeta + custoLeadGoogle) / 2 
+      : custoLeadMeta || custoLeadGoogle;
+    
+    if (custoLeadMedio) {
+      console.log("[Lancamento] Aplicando CPL base:", custoLeadMedio);
+      setCplBase(custoLeadMedio);
+    }
+    
+    // CTR: usa o do Meta (geralmente mais relevante para lançamentos)
+    if (benchmarks.meta?.ctr) {
+      console.log("[Lancamento] Aplicando CTR:", benchmarks.meta.ctr);
+      setCtr(benchmarks.meta.ctr);
+    }
+    
+    // Ticket não vem dos benchmarks de lançamento, então não atualiza
   };
 
   return (

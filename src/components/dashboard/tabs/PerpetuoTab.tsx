@@ -11,19 +11,60 @@ export function PerpetuoTab() {
   const [conversaoPagina, setConversaoPagina] = useState(2);
   const [ticket, setTicket] = useState(400);
 
-  // Cálculos
-  const pageViews = Math.round(investimento / custoPageView);
-  const vendas = Math.round(pageViews * (conversaoPagina / 100));
-  const custoVenda = vendas > 0 ? investimento / vendas : 0;
-  const faturamentoBruto = vendas * ticket;
+  // Cálculos com validações
+  const pageViews = investimento > 0 && custoPageView > 0 
+    ? Math.round(investimento / custoPageView) 
+    : 0;
+  const vendas = pageViews > 0 && conversaoPagina > 0 
+    ? Math.round(pageViews * (conversaoPagina / 100)) 
+    : 0;
+  const custoVenda = vendas > 0 
+    ? investimento / vendas 
+    : 0;
+  const faturamentoBruto = vendas > 0 && ticket > 0 
+    ? vendas * ticket 
+    : 0;
   const lucro = faturamentoBruto - investimento;
-  const roas = investimento > 0 ? faturamentoBruto / investimento : 0;
+  const roas = investimento > 0 
+    ? faturamentoBruto / investimento 
+    : 0;
+  
+  console.log("[Perpetuo] Cálculos:", { 
+    investimento, 
+    custoPageView, 
+    pageViews, 
+    conversaoPagina, 
+    vendas, 
+    custoVenda: custoVenda.toFixed(2), 
+    faturamentoBruto, 
+    lucro, 
+    roas: roas.toFixed(2) 
+  });
 
   const handleBenchmarksGenerated = (benchmarks: any) => {
-    if (benchmarks.custoPageView) setCustoPageView(benchmarks.custoPageView);
-    if (benchmarks.taxaConversao) setConversaoPagina(benchmarks.taxaConversao);
-    if (benchmarks.ticket) setTicket(benchmarks.ticket);
-    if (benchmarks.capaMaximo) setCapaMaximo(benchmarks.capaMaximo);
+    console.log("[Perpetuo] Benchmarks recebidos:", benchmarks);
+    
+    // Usa média do CPA entre Meta e Google como referência para custo de aquisição
+    const cpaMeta = benchmarks.meta?.custoAquisicaoCliente;
+    const cpaGoogle = benchmarks.google?.custoAquisicaoCliente;
+    const cpaMedio = cpaMeta && cpaGoogle 
+      ? (cpaMeta + cpaGoogle) / 2 
+      : cpaMeta || cpaGoogle;
+    
+    if (cpaMedio) {
+      console.log("[Perpetuo] Aplicando CPA máximo:", cpaMedio);
+      setCapaMaximo(cpaMedio);
+      
+      // Estima custo por pageview baseado no CPA e taxa de conversão típica
+      // Assumindo conversão de 2%, cada venda precisa de ~50 pageviews
+      // Então custo/pageview = CPA / 50
+      const custoPageViewEstimado = cpaMedio / 50;
+      console.log("[Perpetuo] Estimando custo por pageview:", custoPageViewEstimado);
+      setCustoPageView(custoPageViewEstimado);
+    }
+    
+    // Benchmarks de perpétuo não fornecem ticket ou taxa de conversão específica
+    // Mantém os valores padrão
   };
 
   return (

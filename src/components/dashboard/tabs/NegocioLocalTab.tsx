@@ -13,22 +13,73 @@ export function NegocioLocalTab() {
   const [taxaFechamento, setTaxaFechamento] = useState(30);
   const [ticketMedio, setTicketMedio] = useState(2000);
 
-  // Cálculos passo a passo
-  const leads = Math.round(investimento / custoLead);
-  const agendamentos = Math.round(leads * (taxaAgendamento / 100));
-  const comparecimentos = Math.round(agendamentos * (taxaComparecimento / 100));
-  const vendas = Math.round(comparecimentos * (taxaFechamento / 100));
-  const faturamentoBruto = vendas * ticketMedio;
+  // Cálculos passo a passo com validações
+  const leads = investimento > 0 && custoLead > 0 
+    ? Math.round(investimento / custoLead) 
+    : 0;
+  const agendamentos = leads > 0 && taxaAgendamento > 0 
+    ? Math.round(leads * (taxaAgendamento / 100)) 
+    : 0;
+  const comparecimentos = agendamentos > 0 && taxaComparecimento > 0 
+    ? Math.round(agendamentos * (taxaComparecimento / 100)) 
+    : 0;
+  const vendas = comparecimentos > 0 && taxaFechamento > 0 
+    ? Math.round(comparecimentos * (taxaFechamento / 100)) 
+    : 0;
+  const faturamentoBruto = vendas > 0 && ticketMedio > 0 
+    ? vendas * ticketMedio 
+    : 0;
   const lucro = faturamentoBruto - investimento;
-  const roi = investimento > 0 ? ((lucro / investimento) * 100) : 0;
-  const cac = vendas > 0 ? (investimento / vendas) : 0;
+  const roi = investimento > 0 && lucro !== 0
+    ? ((lucro / investimento) * 100) 
+    : 0;
+  const cac = vendas > 0 
+    ? (investimento / vendas) 
+    : 0;
+  
+  console.log("[NegocioLocal] Cálculos:", { 
+    investimento, 
+    custoLead, 
+    leads, 
+    agendamentos, 
+    comparecimentos, 
+    vendas, 
+    faturamentoBruto, 
+    lucro, 
+    roi: roi.toFixed(2), 
+    cac: cac.toFixed(2) 
+  });
 
   const handleBenchmarksGenerated = (benchmarks: any) => {
-    if (benchmarks.custoLead) setCustoLead(benchmarks.custoLead);
-    if (benchmarks.taxaAgendamento) setTaxaAgendamento(benchmarks.taxaAgendamento);
-    if (benchmarks.taxaComparecimento) setTaxaComparecimento(benchmarks.taxaComparecimento);
-    if (benchmarks.taxaFechamento) setTaxaFechamento(benchmarks.taxaFechamento);
-    if (benchmarks.ticketMedio) setTicketMedio(benchmarks.ticketMedio);
+    console.log("[NegocioLocal] Benchmarks recebidos:", benchmarks);
+    
+    // Usa média entre Meta e Google, ou pega o que estiver disponível
+    const custoLeadMeta = benchmarks.meta?.custoLead;
+    const custoLeadGoogle = benchmarks.google?.custoLead;
+    const custoLeadMedio = custoLeadMeta && custoLeadGoogle 
+      ? (custoLeadMeta + custoLeadGoogle) / 2 
+      : custoLeadMeta || custoLeadGoogle;
+    
+    if (custoLeadMedio) {
+      console.log("[NegocioLocal] Aplicando custo por lead:", custoLeadMedio);
+      setCustoLead(custoLeadMedio);
+    }
+    if (benchmarks.taxaAgendamento) {
+      console.log("[NegocioLocal] Aplicando taxa de agendamento:", benchmarks.taxaAgendamento);
+      setTaxaAgendamento(benchmarks.taxaAgendamento);
+    }
+    if (benchmarks.taxaComparecimento) {
+      console.log("[NegocioLocal] Aplicando taxa de comparecimento:", benchmarks.taxaComparecimento);
+      setTaxaComparecimento(benchmarks.taxaComparecimento);
+    }
+    if (benchmarks.taxaFechamento) {
+      console.log("[NegocioLocal] Aplicando taxa de fechamento:", benchmarks.taxaFechamento);
+      setTaxaFechamento(benchmarks.taxaFechamento);
+    }
+    if (benchmarks.ticketMedio) {
+      console.log("[NegocioLocal] Aplicando ticket médio:", benchmarks.ticketMedio);
+      setTicketMedio(benchmarks.ticketMedio);
+    }
   };
 
   return (

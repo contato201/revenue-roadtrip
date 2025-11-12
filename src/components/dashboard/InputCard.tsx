@@ -46,11 +46,11 @@ export function InputCard({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let input = e.target.value;
     
-    // Remove tudo exceto números e vírgula
-    input = input.replace(/[^\d,]/g, '');
-    
     if (suffix === "%") {
-      // Para percentual: permite apenas uma vírgula e até 2 decimais
+      // Para percentual: remove tudo exceto números e vírgula
+      input = input.replace(/[^\d,]/g, '');
+      
+      // Permite apenas uma vírgula e até 2 decimais
       const parts = input.split(',');
       if (parts.length > 2) {
         input = parts[0] + ',' + parts.slice(1).join('');
@@ -61,28 +61,40 @@ export function InputCard({
       
       const numValue = parseFloat(input.replace(',', '.')) || 0;
       
-      // Limitar a 100% para evitar valores absurdos
-      if (numValue > 100) {
-        setInputValue('100');
-        onChange(100);
+      // Limitar valores extremos (mas permite mais de 100% para campos como "performance")
+      const maxValue = 1000;
+      if (numValue > maxValue) {
+        setInputValue(maxValue.toString());
+        onChange(maxValue);
         return;
       }
       
       setInputValue(input);
       onChange(numValue);
     } else {
-      // Para valores monetários: formata automaticamente com separadores
-      // Remove tudo exceto números
-      const onlyNumbers = input.replace(/\D/g, '');
+      // Para valores monetários: aceita números naturalmente
+      // Remove separadores existentes mas mantém números
+      const cleanInput = input.replace(/[^\d,]/g, '');
       
-      if (onlyNumbers === '') {
+      if (cleanInput === '') {
         setInputValue('');
         onChange(0);
         return;
       }
       
-      // Converte para número (considerando os últimos 2 dígitos como centavos)
-      const numValue = parseFloat(onlyNumbers) / 100;
+      // Converte vírgula em ponto para parsing
+      const numValue = parseFloat(cleanInput.replace(',', '.')) || 0;
+      
+      // Valida limites razoáveis (até 10 milhões)
+      if (numValue > 10000000) {
+        const maxFormatted = (10000000).toLocaleString('pt-BR', { 
+          minimumFractionDigits: 2, 
+          maximumFractionDigits: 2 
+        });
+        setInputValue(maxFormatted);
+        onChange(10000000);
+        return;
+      }
       
       // Formata para exibição
       const formatted = numValue.toLocaleString('pt-BR', { 
@@ -92,6 +104,8 @@ export function InputCard({
       
       setInputValue(formatted);
       onChange(numValue);
+      
+      console.log("[InputCard] Valor atualizado:", { input: cleanInput, numValue, formatted });
     }
   };
 
