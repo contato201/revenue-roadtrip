@@ -54,19 +54,23 @@ export function BenchmarkingCard({ tipo, onBenchmarksGenerated }: BenchmarkingCa
     setKpis(null);
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const functionUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-benchmarks`;
+      
+      const response = await fetch(functionUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        },
+        body: JSON.stringify({ tipo, segmento, produto, regiao }),
+      });
 
-      const invokeOptions: any = { body: { tipo, segmento, produto, regiao } };
-      if (session?.access_token) {
-        invokeOptions.headers = { Authorization: `Bearer ${session.access_token}` };
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `Erro ${response.status}`);
       }
 
-      const { data, error } = await supabase.functions.invoke("generate-benchmarks", invokeOptions);
-
-      if (error) {
-        console.error("Supabase function error:", error);
-        throw new Error(error.message || "Erro ao gerar benchmarks");
-      }
+      const data = await response.json();
 
       if (!data) {
         throw new Error("Nenhum dado retornado");
