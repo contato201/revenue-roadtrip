@@ -1,4 +1,4 @@
-import { ReactNode, useState, useEffect } from "react";
+import { ReactNode, useState, useEffect, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -30,11 +30,21 @@ export function InputCard({
   className 
 }: InputCardProps) {
   const [inputValue, setInputValue] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [cursorPosition, setCursorPosition] = useState<number | null>(null);
 
   useEffect(() => {
     // Atualiza o valor exibido quando o valor externo muda
     setInputValue(formatForDisplay(value));
   }, [value, suffix]);
+
+  // Restaura posição do cursor após formatação
+  useEffect(() => {
+    if (cursorPosition !== null && inputRef.current) {
+      inputRef.current.setSelectionRange(cursorPosition, cursorPosition);
+      setCursorPosition(null);
+    }
+  }, [inputValue, cursorPosition]);
 
   const formatForDisplay = (val: number) => {
     if (suffix === "%") {
@@ -69,25 +79,31 @@ export function InputCard({
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let input = e.target.value;
+    const input = e.target.value;
+    const currentCursor = e.target.selectionStart || 0;
     
     if (suffix === "%") {
       // Para percentual: remove tudo exceto números e vírgula
-      input = input.replace(/[^\d,]/g, '');
+      let cleaned = input.replace(/[^\d,]/g, '');
       
       // Permite apenas uma vírgula e até 2 decimais
-      const parts = input.split(',');
+      const parts = cleaned.split(',');
       if (parts.length > 2) {
-        input = parts[0] + ',' + parts.slice(1).join('');
+        cleaned = parts[0] + ',' + parts.slice(1).join('');
       }
       if (parts[1] && parts[1].length > 2) {
-        input = parts[0] + ',' + parts[1].substring(0, 2);
+        cleaned = parts[0] + ',' + parts[1].substring(0, 2);
       }
       
-      const numValue = parseFloat(input.replace(',', '.'));
+      const numValue = parseFloat(cleaned.replace(',', '.'));
       
       // Validação: NaN vira 0
       if (isNaN(numValue) || !isFinite(numValue)) {
+        if (cleaned === '' || cleaned === ',') {
+          setInputValue(cleaned);
+          onChange(0);
+          return;
+        }
         setInputValue('0');
         onChange(0);
         return;
@@ -103,15 +119,25 @@ export function InputCard({
         return;
       }
       
-      setInputValue(input);
+      // Calcula nova posição do cursor (mantém posição relativa)
+      const diff = cleaned.length - inputValue.length;
+      const newCursor = Math.max(0, currentCursor + diff);
+      setCursorPosition(newCursor);
+      
+      setInputValue(cleaned);
       onChange(cappedValue);
     } else {
-      // Para valores monetários: formata em tempo real
+      // Para valores monetários: calcula posição antes da formatação
+      const previousValue = inputValue;
+      const digitsBeforeCursor = input.substring(0, currentCursor).replace(/\D/g, '').length;
+      
+      // Formata em tempo real
       const formatted = formatCurrencyWhileTyping(input);
       
       if (formatted === '') {
         setInputValue('');
         onChange(0);
+        setCursorPosition(0);
         return;
       }
       
@@ -122,12 +148,35 @@ export function InputCard({
       if (isNaN(numValue) || !isFinite(numValue)) {
         setInputValue('0,00');
         onChange(0);
+        setCursorPosition(1);
         return;
       }
       
       // Valida limites razoáveis (mínimo 0, até 10 milhões)
       const capped = Math.min(Math.max(0, numValue), 10000000);
       
+      // Calcula nova posição do cursor baseada em dígitos
+      let newCursor = 0;
+      let digitsCount = 0;
+      for (let i = 0; i < formatted.length; i++) {
+        if (/\d/.test(formatted[i])) {
+          digitsCount++;
+          if (digitsCount >= digitsBeforeCursor) {
+            newCursor = i + 1;
+            break;
+          }
+        }
+      }
+      
+      // Ajuste fino: se estava após a vírgula, mantém após a vírgula
+      if (currentCursor > previousValue.indexOf(',') && previousValue.indexOf(',') !== -1) {
+        const commaIndex = formatted.indexOf(',');
+        if (commaIndex !== -1) {
+          newCursor = Math.max(newCursor, commaIndex + 1);
+        }
+      }
+      
+      setCursorPosition(newCursor);
       setInputValue(formatted);
       onChange(capped);
     }
@@ -147,6 +196,7 @@ export function InputCard({
             </span>
           )}
           <Input
+            ref={inputRef}
             type="text"
             value={inputValue}
             onChange={handleChange}
@@ -155,6 +205,8 @@ export function InputCard({
               prefix && "pl-12",
               suffix && "pr-14"
             )}
+            autoComplete="off"
+            inputMode={suffix === "%" ? "decimal" : "numeric"}
           />
           {suffix && (
             <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground text-sm font-medium pointer-events-none">
