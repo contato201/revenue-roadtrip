@@ -183,6 +183,7 @@ export function BenchmarkingCard({ tipo, onBenchmarksGenerated }: BenchmarkingCa
         </div>
 
         <Button
+          type="button"
           onClick={handleGenerate}
           disabled={isLoading}
           className="w-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors font-medium"
