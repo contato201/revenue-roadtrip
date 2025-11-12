@@ -1,9 +1,18 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
+
+// Input validation schema
+const requestSchema = z.object({
+  tipo: z.enum(["local", "lancamento", "perpetuo"]),
+  segmento: z.string().trim().min(1).max(100),
+  produto: z.string().trim().min(1).max(200),
+  regiao: z.string().trim().max(100).optional(),
+});
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -11,19 +20,24 @@ serve(async (req) => {
   }
 
   try {
-    const { tipo, segmento, regiao, produto }: { 
-      tipo: "local" | "lancamento" | "perpetuo", 
-      segmento: string, 
-      regiao: string,
-      produto: string
-    } = await req.json();
+    const rawBody = await req.json();
+    
+    // Validate input
+    const validationResult = requestSchema.safeParse(rawBody);
+    if (!validationResult.success) {
+      return new Response(
+        JSON.stringify({ error: "Dados de entrada inválidos" }), 
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const { tipo, segmento, regiao, produto } = validationResult.data;
+    
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
-
-    console.log("Generating benchmarks for:", { tipo, segmento, regiao, produto });
 
     // Sistema de prompts diferente para cada tipo
     const systemPrompts = {
@@ -222,13 +236,10 @@ Inclua para cada plataforma SOMENTE: CPM médio, CPC médio, CTR médio, CPA mé
           { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      const errorText = await response.text();
-      console.error("AI gateway error:", response.status, errorText);
       throw new Error("Erro ao gerar benchmarks");
     }
 
     const data = await response.json();
-    console.log("AI Response:", JSON.stringify(data, null, 2));
     
     const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
     if (!toolCall) {
@@ -236,14 +247,12 @@ Inclua para cada plataforma SOMENTE: CPM médio, CPC médio, CTR médio, CPA mé
     }
 
     const benchmarks = JSON.parse(toolCall.function.arguments);
-    console.log("Benchmarks generated:", benchmarks);
 
     return new Response(JSON.stringify(benchmarks), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
 
   } catch (error) {
-    console.error("Error in generate-benchmarks:", error);
     return new Response(
       JSON.stringify({ error: error instanceof Error ? error.message : "Erro desconhecido" }), 
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
