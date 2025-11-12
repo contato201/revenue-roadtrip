@@ -55,6 +55,8 @@ export function BenchmarkingCard({ tipo, onBenchmarksGenerated }: BenchmarkingCa
 
     try {
       const functionUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-benchmarks`;
+      console.log("🔵 Chamando função:", functionUrl);
+      console.log("📤 Enviando:", { tipo, segmento, produto, regiao });
       
       const response = await fetch(functionUrl, {
         method: "POST",
@@ -65,19 +67,37 @@ export function BenchmarkingCard({ tipo, onBenchmarksGenerated }: BenchmarkingCa
         body: JSON.stringify({ tipo, segmento, produto, regiao }),
       });
 
+      console.log("📡 Status da resposta:", response.status);
+
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
+        const errorText = await response.text();
+        console.error("❌ Erro da API:", errorText);
+        let errorData;
+        try {
+          errorData = JSON.parse(errorText);
+        } catch {
+          errorData = { error: errorText };
+        }
         throw new Error(errorData.error || `Erro ${response.status}`);
       }
 
-      const data = await response.json();
+      const responseText = await response.text();
+      console.log("📥 Resposta bruta:", responseText);
+      
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error("❌ Erro ao parsear JSON:", parseError);
+        throw new Error("Resposta inválida do servidor");
+      }
 
       if (!data) {
         throw new Error("Nenhum dado retornado");
       }
 
-      console.log("Benchmarks received:", data);
-      setExplicacao(data.explicacao);
+      console.log("✅ Benchmarks recebidos:", data);
+      setExplicacao(data.explicacao || "");
       setKpis(data);
       onBenchmarksGenerated(data);
 
@@ -86,7 +106,9 @@ export function BenchmarkingCard({ tipo, onBenchmarksGenerated }: BenchmarkingCa
         description: "Os valores e KPIs foram preenchidos automaticamente",
       });
     } catch (error) {
-      console.error("Error generating benchmarks:", error);
+      console.error("❌ Erro completo:", error);
+      setExplicacao("");
+      setKpis(null);
       toast({
         title: "Erro ao gerar benchmarks",
         description: error instanceof Error ? error.message : "Tente novamente",
