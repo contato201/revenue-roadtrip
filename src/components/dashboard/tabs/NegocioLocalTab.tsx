@@ -172,25 +172,25 @@ export function NegocioLocalTab() {
         <div className="grid gap-4 md:grid-cols-5">
           <MetricCard
             label="👥 Leads"
-            value={leads}
+            value={leads.toLocaleString('pt-BR')}
             description="Pessoas interessadas"
             variant="default"
           />
           <MetricCard
             label="📅 Agendamentos"
-            value={agendamentos}
+            value={agendamentos.toLocaleString('pt-BR')}
             description="Pessoas que agendaram"
             variant="default"
           />
           <MetricCard
             label="✅ Compareceram"
-            value={comparecimentos}
+            value={comparecimentos.toLocaleString('pt-BR')}
             description="Pessoas que apareceram"
             variant="primary"
           />
           <MetricCard
             label="💰 Vendas"
-            value={vendas}
+            value={vendas.toLocaleString('pt-BR')}
             description="Clientes conquistados"
             variant="success"
           />

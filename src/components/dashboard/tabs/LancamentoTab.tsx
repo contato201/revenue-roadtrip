@@ -20,14 +20,14 @@ export function LancamentoTab() {
 
   // Referências para o impacto no CPL (100% de performance)
   const ctrReferencia = 2.5; // CTR de referência (100% de performance)
-  const conversaoReferencia = 15; // Conversão de referência (100% de performance)
+  const conversaoReferencia = 100; // 100% = referência correta
   
   // CPL ajustado baseado nos fatores
   // Quando CTR e conversão estão na referência, CPL = cplBase
   // Abaixo da referência, CPL aumenta (pior performance)
   // Acima da referência, CPL diminui (melhor performance)
   const fatorCtr = ctrReferencia / ctr;
-  const fatorConversao = conversaoReferencia / conversaoPagina; // CORRIGIDO: era 100 / conversaoPagina
+  const fatorConversao = conversaoReferencia / conversaoPagina;
   const custoLead = cplBase * fatorCtr * fatorConversao;
   
   console.log("[Lancamento] Cálculo CPL:", { 
@@ -44,8 +44,8 @@ export function LancamentoTab() {
   const investimentoOutros = investimentoTotal - investimentoCaptacao;
 
   // Cálculos de leads e vendas com validações
-  const numeroLeads = investimentoTotal > 0 && custoLead > 0 
-    ? Math.round(investimentoTotal / custoLead) 
+  const numeroLeads = investimentoCaptacao > 0 && custoLead > 0 
+    ? Math.round(investimentoCaptacao / custoLead) 
     : 0;
   const numeroVendas = numeroLeads > 0 && taxaConversao > 0 
     ? Math.round(numeroLeads * (taxaConversao / 100)) 
