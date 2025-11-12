@@ -55,13 +55,13 @@ export function BenchmarkingCard({ tipo, onBenchmarksGenerated }: BenchmarkingCa
 
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      
-      const { data, error } = await supabase.functions.invoke("generate-benchmarks", {
-        body: { tipo, segmento, produto, regiao },
-        headers: {
-          Authorization: `Bearer ${session?.access_token}`
-        }
-      });
+
+      const invokeOptions: any = { body: { tipo, segmento, produto, regiao } };
+      if (session?.access_token) {
+        invokeOptions.headers = { Authorization: `Bearer ${session.access_token}` };
+      }
+
+      const { data, error } = await supabase.functions.invoke("generate-benchmarks", invokeOptions);
 
       if (error) {
         console.error("Supabase function error:", error);

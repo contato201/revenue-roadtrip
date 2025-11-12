@@ -73,39 +73,34 @@ export function InputCard({
       onChange(numValue);
     } else {
       // Para valores monetários: aceita números naturalmente
-      // Remove separadores existentes mas mantém números
-      const cleanInput = input.replace(/[^\d,]/g, '');
-      
-      if (cleanInput === '') {
+      // Mantém números e separadores (.,), remove o resto
+      const raw = input.replace(/[^\d.,]/g, '');
+
+      if (raw === '') {
         setInputValue('');
         onChange(0);
         return;
       }
-      
-      // Converte vírgula em ponto para parsing
-      const numValue = parseFloat(cleanInput.replace(',', '.')) || 0;
-      
+
+      // Trata pontos como separadores de milhar e vírgula como decimal (pt-BR)
+      const normalized = raw.replace(/\./g, '').replace(',', '.');
+
+      const numValue = parseFloat(normalized);
+      const safeValue = isFinite(numValue) && !isNaN(numValue) ? numValue : 0;
+
       // Valida limites razoáveis (até 10 milhões)
-      if (numValue > 10000000) {
-        const maxFormatted = (10000000).toLocaleString('pt-BR', { 
-          minimumFractionDigits: 2, 
-          maximumFractionDigits: 2 
-        });
-        setInputValue(maxFormatted);
-        onChange(10000000);
-        return;
-      }
-      
-      // Formata para exibição
-      const formatted = numValue.toLocaleString('pt-BR', { 
+      const capped = Math.min(safeValue, 10000000);
+
+      // Formata para exibição em pt-BR com 2 casas
+      const formatted = capped.toLocaleString('pt-BR', { 
         minimumFractionDigits: 2, 
         maximumFractionDigits: 2 
       });
-      
+
       setInputValue(formatted);
-      onChange(numValue);
+      onChange(capped);
       
-      console.log("[InputCard] Valor atualizado:", { input: cleanInput, numValue, formatted });
+      console.log("[InputCard] Valor atualizado:", { input: raw, normalized, numValue: capped, formatted });
     }
   };
 

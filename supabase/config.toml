@@ -1,1 +1,4 @@
 project_id = "pyludeainfqzflwlrphh"
+
+[functions.generate-benchmarks]
+verify_jwt = false
