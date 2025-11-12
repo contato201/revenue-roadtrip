@@ -40,34 +40,56 @@ export function LancamentoTab() {
   });
 
   // Cálculos de investimento com validação
-  const investimentoCaptacao = investimentoTotal * (percentualCaptacao / 100);
+  const investimentoCaptacao = (investimentoTotal > 0 && percentualCaptacao >= 0 && percentualCaptacao <= 100)
+    ? investimentoTotal * (percentualCaptacao / 100)
+    : 0;
   const investimentoOutros = investimentoTotal - investimentoCaptacao;
 
-  // Cálculos de leads e vendas com validações
-  const numeroLeads = investimentoCaptacao > 0 && custoLead > 0 
+  // Cálculos de leads e vendas com validações rigorosas
+  const numeroLeads = (investimentoCaptacao > 0 && custoLead > 0) 
     ? Math.round(investimentoCaptacao / custoLead) 
     : 0;
-  const numeroVendas = numeroLeads > 0 && taxaConversao > 0 
+  
+  const numeroVendas = (numeroLeads > 0 && taxaConversao > 0 && taxaConversao <= 100) 
     ? Math.round(numeroLeads * (taxaConversao / 100)) 
     : 0;
   
   // Cálculos financeiros com validações
-  const faturamentoBruto = numeroVendas > 0 && ticket > 0 
+  const faturamentoBruto = (numeroVendas > 0 && ticket > 0) 
     ? numeroVendas * ticket 
     : 0;
+  
   const lucroBruto = faturamentoBruto - investimentoTotal;
-  const roas = investimentoTotal > 0 
+  
+  const roas = (investimentoTotal > 0 && faturamentoBruto >= 0) 
     ? faturamentoBruto / investimentoTotal 
     : 0;
   
-  console.log("[Lancamento] Resultados:", { 
-    investimentoTotal, 
-    custoLead: custoLead.toFixed(2), 
-    numeroLeads, 
-    numeroVendas, 
-    faturamentoBruto, 
-    lucroBruto, 
-    roas: roas.toFixed(2) 
+  console.log("[Lancamento] Resultados detalhados:", { 
+    inputs: { 
+      investimentoTotal, 
+      cplBase, 
+      taxaConversao, 
+      ticket, 
+      percentualCaptacao, 
+      ctr, 
+      conversaoPagina 
+    },
+    calculados: {
+      investimentoCaptacao,
+      custoLead: custoLead.toFixed(2), 
+      numeroLeads, 
+      numeroVendas, 
+      faturamentoBruto, 
+      lucroBruto, 
+      roas: roas.toFixed(2)
+    },
+    validacoes: {
+      investimentoOk: investimentoCaptacao > 0,
+      leadsOk: investimentoCaptacao > 0 && custoLead > 0,
+      vendasOk: numeroLeads > 0 && taxaConversao > 0 && taxaConversao <= 100,
+      faturamentoOk: numeroVendas > 0 && ticket > 0
+    }
   });
 
   const handleBenchmarksGenerated = (benchmarks: any) => {

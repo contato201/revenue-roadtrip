@@ -52,6 +52,11 @@ export function InputCard({
     // Converte para número (em centavos)
     const numberValue = parseInt(digits, 10);
     
+    // Valida limite máximo durante digitação (10 milhões)
+    if (numberValue > 1000000000) { // 10M em centavos = 1 bilhão de centavos
+      return formatCurrencyWhileTyping('1000000000');
+    }
+    
     // Formata em reais com centavos
     const reais = Math.floor(numberValue / 100);
     const centavos = numberValue % 100;
@@ -79,18 +84,27 @@ export function InputCard({
         input = parts[0] + ',' + parts[1].substring(0, 2);
       }
       
-      const numValue = parseFloat(input.replace(',', '.')) || 0;
+      const numValue = parseFloat(input.replace(',', '.'));
       
-      // Limitar valores extremos (mas permite mais de 100% para campos como "performance")
+      // Validação: NaN vira 0
+      if (isNaN(numValue) || !isFinite(numValue)) {
+        setInputValue('0');
+        onChange(0);
+        return;
+      }
+      
+      // Limitar valores extremos (permite mais de 100% para performance, max 1000%)
       const maxValue = 1000;
-      if (numValue > maxValue) {
-        setInputValue(maxValue.toString());
-        onChange(maxValue);
+      const cappedValue = Math.min(Math.max(0, numValue), maxValue);
+      
+      if (cappedValue !== numValue) {
+        setInputValue(cappedValue.toString().replace('.', ','));
+        onChange(cappedValue);
         return;
       }
       
       setInputValue(input);
-      onChange(numValue);
+      onChange(cappedValue);
     } else {
       // Para valores monetários: formata em tempo real
       const formatted = formatCurrencyWhileTyping(input);
@@ -102,15 +116,20 @@ export function InputCard({
       }
       
       // Converte de volta para número (remove formatação)
-      const numValue = parseFloat(formatted.replace(/\./g, '').replace(',', '.')) || 0;
+      const numValue = parseFloat(formatted.replace(/\./g, '').replace(',', '.'));
       
-      // Valida limites razoáveis (até 10 milhões)
-      const capped = Math.min(numValue, 10000000);
+      // Validação: NaN ou Infinity vira 0
+      if (isNaN(numValue) || !isFinite(numValue)) {
+        setInputValue('0,00');
+        onChange(0);
+        return;
+      }
+      
+      // Valida limites razoáveis (mínimo 0, até 10 milhões)
+      const capped = Math.min(Math.max(0, numValue), 10000000);
       
       setInputValue(formatted);
       onChange(capped);
-      
-      console.log("[InputCard] Formatado em tempo real:", { input, formatted, numValue: capped });
     }
   };
 

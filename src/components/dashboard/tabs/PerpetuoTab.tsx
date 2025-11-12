@@ -11,34 +11,51 @@ export function PerpetuoTab() {
   const [conversaoPagina, setConversaoPagina] = useState(2);
   const [ticket, setTicket] = useState(400);
 
-  // Cálculos com validações
-  const pageViews = investimento > 0 && custoPageView > 0 
+  // Cálculos com validações rigorosas
+  const pageViews = (investimento > 0 && custoPageView > 0) 
     ? Math.round(investimento / custoPageView) 
     : 0;
-  const vendas = pageViews > 0 && conversaoPagina > 0 
+  
+  const vendas = (pageViews > 0 && conversaoPagina > 0 && conversaoPagina <= 100) 
     ? Math.round(pageViews * (conversaoPagina / 100)) 
     : 0;
-  const custoVenda = vendas > 0 
+  
+  const custoVenda = (vendas > 0) 
     ? investimento / vendas 
     : 0;
-  const faturamentoBruto = vendas > 0 && ticket > 0 
+  
+  const faturamentoBruto = (vendas > 0 && ticket > 0) 
     ? vendas * ticket 
     : 0;
+  
   const lucro = faturamentoBruto - investimento;
-  const roas = investimento > 0 
+  
+  const roas = (investimento > 0 && faturamentoBruto >= 0) 
     ? faturamentoBruto / investimento 
     : 0;
   
-  console.log("[Perpetuo] Cálculos:", { 
-    investimento, 
-    custoPageView, 
-    pageViews, 
-    conversaoPagina, 
-    vendas, 
-    custoVenda: custoVenda.toFixed(2), 
-    faturamentoBruto, 
-    lucro, 
-    roas: roas.toFixed(2) 
+  console.log("[Perpetuo] Cálculos detalhados:", { 
+    inputs: { 
+      investimento, 
+      capaMaximo, 
+      custoPageView, 
+      conversaoPagina, 
+      ticket 
+    },
+    resultados: {
+      pageViews, 
+      vendas, 
+      custoVenda: custoVenda.toFixed(2), 
+      faturamentoBruto, 
+      lucro, 
+      roas: roas.toFixed(2)
+    },
+    validacoes: {
+      pageViewsOk: investimento > 0 && custoPageView > 0,
+      vendasOk: pageViews > 0 && conversaoPagina > 0 && conversaoPagina <= 100,
+      faturamentoOk: vendas > 0 && ticket > 0,
+      cacDentroDoCPA: vendas > 0 ? custoVenda <= capaMaximo : false
+    }
   });
 
   const handleBenchmarksGenerated = (benchmarks: any) => {

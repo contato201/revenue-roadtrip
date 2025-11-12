@@ -13,41 +13,55 @@ export function NegocioLocalTab() {
   const [taxaFechamento, setTaxaFechamento] = useState(30);
   const [ticketMedio, setTicketMedio] = useState(2000);
 
-  // Cálculos passo a passo com validações
-  const leads = investimento > 0 && custoLead > 0 
+  // Cálculos passo a passo com validações rigorosas
+  const leads = (investimento > 0 && custoLead > 0) 
     ? Math.round(investimento / custoLead) 
     : 0;
-  const agendamentos = leads > 0 && taxaAgendamento > 0 
+  
+  const agendamentos = (leads > 0 && taxaAgendamento > 0 && taxaAgendamento <= 100) 
     ? Math.round(leads * (taxaAgendamento / 100)) 
     : 0;
-  const comparecimentos = agendamentos > 0 && taxaComparecimento > 0 
+  
+  const comparecimentos = (agendamentos > 0 && taxaComparecimento > 0 && taxaComparecimento <= 100) 
     ? Math.round(agendamentos * (taxaComparecimento / 100)) 
     : 0;
-  const vendas = comparecimentos > 0 && taxaFechamento > 0 
+  
+  const vendas = (comparecimentos > 0 && taxaFechamento > 0 && taxaFechamento <= 100) 
     ? Math.round(comparecimentos * (taxaFechamento / 100)) 
     : 0;
-  const faturamentoBruto = vendas > 0 && ticketMedio > 0 
+  
+  const faturamentoBruto = (vendas > 0 && ticketMedio > 0) 
     ? vendas * ticketMedio 
     : 0;
+  
   const lucro = faturamentoBruto - investimento;
-  const roi = investimento > 0 && lucro !== 0
+  
+  const roi = (investimento > 0 && faturamentoBruto > 0)
     ? ((lucro / investimento) * 100) 
     : 0;
-  const cac = vendas > 0 
+  
+  const cac = (vendas > 0) 
     ? (investimento / vendas) 
     : 0;
   
-  console.log("[NegocioLocal] Cálculos:", { 
-    investimento, 
-    custoLead, 
-    leads, 
-    agendamentos, 
-    comparecimentos, 
-    vendas, 
-    faturamentoBruto, 
-    lucro, 
-    roi: roi.toFixed(2), 
-    cac: cac.toFixed(2) 
+  console.log("[NegocioLocal] Cálculos detalhados:", { 
+    inputs: { investimento, custoLead, taxaAgendamento, taxaComparecimento, taxaFechamento, ticketMedio },
+    resultados: { 
+      leads, 
+      agendamentos, 
+      comparecimentos, 
+      vendas, 
+      faturamentoBruto, 
+      lucro, 
+      roi: roi.toFixed(2), 
+      cac: cac.toFixed(2) 
+    },
+    validacoes: {
+      leadsOk: investimento > 0 && custoLead > 0,
+      agendamentosOk: leads > 0 && taxaAgendamento > 0 && taxaAgendamento <= 100,
+      comparecimentosOk: agendamentos > 0 && taxaComparecimento > 0 && taxaComparecimento <= 100,
+      vendasOk: comparecimentos > 0 && taxaFechamento > 0 && taxaFechamento <= 100
+    }
   });
 
   const handleBenchmarksGenerated = (benchmarks: any) => {
