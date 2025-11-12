@@ -43,6 +43,26 @@ export function InputCard({
     return val.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   };
 
+  const formatCurrencyWhileTyping = (value: string): string => {
+    // Remove tudo exceto dígitos
+    const digits = value.replace(/\D/g, '');
+    
+    if (digits === '') return '';
+    
+    // Converte para número (em centavos)
+    const numberValue = parseInt(digits, 10);
+    
+    // Formata em reais com centavos
+    const reais = Math.floor(numberValue / 100);
+    const centavos = numberValue % 100;
+    
+    // Formata parte inteira com separadores de milhar
+    const reaisFormatted = reais.toLocaleString('pt-BR');
+    
+    // Retorna valor formatado
+    return `${reaisFormatted},${centavos.toString().padStart(2, '0')}`;
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let input = e.target.value;
     
@@ -72,35 +92,25 @@ export function InputCard({
       setInputValue(input);
       onChange(numValue);
     } else {
-      // Para valores monetários: aceita números naturalmente
-      // Mantém números e separadores (.,), remove o resto
-      const raw = input.replace(/[^\d.,]/g, '');
-
-      if (raw === '') {
+      // Para valores monetários: formata em tempo real
+      const formatted = formatCurrencyWhileTyping(input);
+      
+      if (formatted === '') {
         setInputValue('');
         onChange(0);
         return;
       }
-
-      // Trata pontos como separadores de milhar e vírgula como decimal (pt-BR)
-      const normalized = raw.replace(/\./g, '').replace(',', '.');
-
-      const numValue = parseFloat(normalized);
-      const safeValue = isFinite(numValue) && !isNaN(numValue) ? numValue : 0;
-
+      
+      // Converte de volta para número (remove formatação)
+      const numValue = parseFloat(formatted.replace(/\./g, '').replace(',', '.')) || 0;
+      
       // Valida limites razoáveis (até 10 milhões)
-      const capped = Math.min(safeValue, 10000000);
-
-      // Formata para exibição em pt-BR com 2 casas
-      const formatted = capped.toLocaleString('pt-BR', { 
-        minimumFractionDigits: 2, 
-        maximumFractionDigits: 2 
-      });
-
+      const capped = Math.min(numValue, 10000000);
+      
       setInputValue(formatted);
       onChange(capped);
       
-      console.log("[InputCard] Valor atualizado:", { input: raw, normalized, numValue: capped, formatted });
+      console.log("[InputCard] Formatado em tempo real:", { input, formatted, numValue: capped });
     }
   };
 
