@@ -39,20 +39,17 @@ export function InputCard({
   }, [value, isFocused, suffix]);
 
   const formatForDisplay = (val: number) => {
+    const safeVal = typeof val === 'number' && isFinite(val) ? val : 0;
     if (suffix === "%") {
-      return val.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+      return safeVal.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
     }
-    return val.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return safeVal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   };
 
   const handleFocus = () => {
     setIsFocused(true);
-    // No foco, mostra o valor sem formatação para facilitar edição
-    if (suffix === "%") {
-      setDisplayValue(value.toString().replace('.', ','));
-    } else {
-      setDisplayValue(value.toString().replace('.', ','));
-    }
+    const safeVal = typeof value === 'number' && isFinite(value) ? value : 0;
+    setDisplayValue(safeVal.toString().replace('.', ','));
   };
 
   const handleBlur = () => {
