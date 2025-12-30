@@ -1,9 +1,24 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { InputCard } from "../InputCard";
 import { MetricCard } from "../MetricCard";
 import { BenchmarkingCard } from "../BenchmarkingCard";
 import { Card } from "@/components/ui/card";
 import { TrendingUp, DollarSign, Users, Calendar, Target, Phone, UserPlus } from "lucide-react";
+
+// Função segura para divisão
+const safeDivide = (a: number, b: number, fallback = 0): number => {
+  if (!Number.isFinite(a) || !Number.isFinite(b) || b === 0) return fallback;
+  const result = a / b;
+  return Number.isFinite(result) ? result : fallback;
+};
+
+// Função segura para multiplicação com porcentagem
+const safePercent = (value: number, percent: number, fallback = 0): number => {
+  if (!Number.isFinite(value) || !Number.isFinite(percent)) return fallback;
+  if (percent < 0 || percent > 100) return fallback;
+  const result = value * (percent / 100);
+  return Number.isFinite(result) ? Math.round(result) : fallback;
+};
 
 export function NegocioLocalTab() {
   const [investimento, setInvestimento] = useState(1000);
@@ -13,98 +28,55 @@ export function NegocioLocalTab() {
   const [taxaFechamento, setTaxaFechamento] = useState(30);
   const [ticketMedio, setTicketMedio] = useState(2000);
 
-  // Cálculos passo a passo com validações rigorosas
-  const leads = (investimento > 0 && custoLead > 0) 
-    ? Math.round(investimento / custoLead) 
-    : 0;
-  
-  const agendamentos = (leads > 0 && taxaAgendamento > 0 && taxaAgendamento <= 100) 
-    ? Math.round(leads * (taxaAgendamento / 100)) 
-    : 0;
-  
-  const comparecimentos = (agendamentos > 0 && taxaComparecimento > 0 && taxaComparecimento <= 100) 
-    ? Math.round(agendamentos * (taxaComparecimento / 100)) 
-    : 0;
-  
-  const vendas = (comparecimentos > 0 && taxaFechamento > 0 && taxaFechamento <= 100) 
-    ? Math.round(comparecimentos * (taxaFechamento / 100)) 
-    : 0;
-  
-  const faturamentoBruto = (vendas > 0 && ticketMedio > 0) 
-    ? vendas * ticketMedio 
-    : 0;
-  
-  const lucro = faturamentoBruto - investimento;
-  
-  const roi = (investimento > 0 && faturamentoBruto > 0)
-    ? ((lucro / investimento) * 100) 
-    : 0;
-  
-  const cac = (vendas > 0) 
-    ? (investimento / vendas) 
-    : 0;
-  
-  console.log("[NegocioLocal] Cálculos detalhados:", { 
-    inputs: { investimento, custoLead, taxaAgendamento, taxaComparecimento, taxaFechamento, ticketMedio },
-    resultados: { 
-      leads, 
-      agendamentos, 
-      comparecimentos, 
-      vendas, 
-      faturamentoBruto, 
-      lucro, 
-      roi: roi.toFixed(2), 
-      cac: cac.toFixed(2) 
-    },
-    validacoes: {
-      leadsOk: investimento > 0 && custoLead > 0,
-      agendamentosOk: leads > 0 && taxaAgendamento > 0 && taxaAgendamento <= 100,
-      comparecimentosOk: agendamentos > 0 && taxaComparecimento > 0 && taxaComparecimento <= 100,
-      vendasOk: comparecimentos > 0 && taxaFechamento > 0 && taxaFechamento <= 100
-    }
-  });
+  // Cálculos com useMemo para performance e validações
+  const calculos = useMemo(() => {
+    const leads = custoLead > 0 ? Math.round(safeDivide(investimento, custoLead)) : 0;
+    const agendamentos = safePercent(leads, taxaAgendamento);
+    const comparecimentos = safePercent(agendamentos, taxaComparecimento);
+    const vendas = safePercent(comparecimentos, taxaFechamento);
+    const faturamentoBruto = vendas * ticketMedio;
+    const lucro = faturamentoBruto - investimento;
+    const roi = safeDivide(lucro, investimento) * 100;
+    const cac = safeDivide(investimento, vendas);
+
+    return { leads, agendamentos, comparecimentos, vendas, faturamentoBruto, lucro, roi, cac };
+  }, [investimento, custoLead, taxaAgendamento, taxaComparecimento, taxaFechamento, ticketMedio]);
+
+  const { leads, agendamentos, comparecimentos, vendas, faturamentoBruto, lucro, roi, cac } = calculos;
 
   const handleBenchmarksGenerated = (benchmarks: any) => {
-    console.log("[NegocioLocal] Benchmarks recebidos:", benchmarks);
+    if (!benchmarks) return;
     
-    // Usa média entre Meta e Google, ou pega o que estiver disponível
     const custoLeadMeta = benchmarks.meta?.custoLead;
     const custoLeadGoogle = benchmarks.google?.custoLead;
     const custoLeadMedio = custoLeadMeta && custoLeadGoogle 
       ? (custoLeadMeta + custoLeadGoogle) / 2 
       : custoLeadMeta || custoLeadGoogle;
     
-    if (custoLeadMedio) {
-      console.log("[NegocioLocal] Aplicando custo por lead:", custoLeadMedio);
+    if (custoLeadMedio && Number.isFinite(custoLeadMedio)) {
       setCustoLead(custoLeadMedio);
     }
-    if (benchmarks.taxaAgendamento) {
-      console.log("[NegocioLocal] Aplicando taxa de agendamento:", benchmarks.taxaAgendamento);
+    if (benchmarks.taxaAgendamento && Number.isFinite(benchmarks.taxaAgendamento)) {
       setTaxaAgendamento(benchmarks.taxaAgendamento);
     }
-    if (benchmarks.taxaComparecimento) {
-      console.log("[NegocioLocal] Aplicando taxa de comparecimento:", benchmarks.taxaComparecimento);
+    if (benchmarks.taxaComparecimento && Number.isFinite(benchmarks.taxaComparecimento)) {
       setTaxaComparecimento(benchmarks.taxaComparecimento);
     }
-    if (benchmarks.taxaFechamento) {
-      console.log("[NegocioLocal] Aplicando taxa de fechamento:", benchmarks.taxaFechamento);
+    if (benchmarks.taxaFechamento && Number.isFinite(benchmarks.taxaFechamento)) {
       setTaxaFechamento(benchmarks.taxaFechamento);
     }
-    if (benchmarks.ticketMedio) {
-      console.log("[NegocioLocal] Aplicando ticket médio:", benchmarks.ticketMedio);
+    if (benchmarks.ticketMedio && Number.isFinite(benchmarks.ticketMedio)) {
       setTicketMedio(benchmarks.ticketMedio);
     }
   };
 
   return (
     <div className="space-y-6">
-      {/* Benchmarking */}
       <BenchmarkingCard 
         tipo="local" 
         onBenchmarksGenerated={handleBenchmarksGenerated}
       />
 
-      {/* Explicação Simples */}
       <Card className="p-6 border-l-4 border-l-primary bg-card">
         <h3 className="text-lg font-display font-semibold text-foreground mb-2">Como Funciona?</h3>
         <p className="text-sm text-muted-foreground">
@@ -133,6 +105,7 @@ export function NegocioLocalTab() {
             prefix="R$"
             icon={<UserPlus className="w-4 h-4" />}
             description="Quanto custa para gerar 1 lead"
+            min={0.01}
           />
         </div>
       </div>
@@ -182,7 +155,6 @@ export function NegocioLocalTab() {
           <h3 className="text-base font-display font-semibold text-foreground">3️⃣ Seus Resultados</h3>
         </div>
         
-        {/* Funil Visual */}
         <div className="grid gap-4 md:grid-cols-5">
           <MetricCard
             label="👥 Leads"
@@ -216,7 +188,6 @@ export function NegocioLocalTab() {
           />
         </div>
 
-        {/* CAC em Destaque */}
         <Card className="p-6 border border-primary/30 bg-primary/5">
           <div className="flex items-center justify-between">
             <div>
@@ -224,10 +195,12 @@ export function NegocioLocalTab() {
                 CAC - Custo de Aquisição de Cliente
               </p>
               <p className="text-4xl font-display font-bold text-primary">
-                R$ {cac.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                R$ {cac.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </p>
               <p className="text-sm text-muted-foreground mt-2">
-                Você gasta R$ {cac.toFixed(2)} para conquistar cada cliente
+                {vendas > 0 
+                  ? `Você gasta R$ ${cac.toFixed(2)} para conquistar cada cliente`
+                  : "Ajuste os valores para calcular o CAC"}
               </p>
             </div>
             <div className="hidden md:block p-4 bg-primary/10 rounded-lg">
@@ -236,7 +209,6 @@ export function NegocioLocalTab() {
           </div>
         </Card>
 
-        {/* Resultado Final */}
         <div className="grid gap-4 md:grid-cols-2">
           <Card className="p-8 border-l-4 border-l-success bg-success/5">
             <div className="flex items-center gap-4">
@@ -250,7 +222,7 @@ export function NegocioLocalTab() {
                 </p>
                 <p className="text-sm text-muted-foreground mt-2">
                   {lucro > 0 
-                    ? `Você lucrará ${roi.toFixed(0)}% sobre o investimento! 🎉` 
+                    ? `Você lucrará ${roi.toFixed(0)}% sobre o investimento!` 
                     : 'Ajuste os valores para ter lucro'}
                 </p>
               </div>
