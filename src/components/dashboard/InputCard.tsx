@@ -1,4 +1,4 @@
-import { ReactNode, useState, useEffect, useCallback } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,14 +17,6 @@ interface InputCardProps {
   className?: string;
 }
 
-// Função auxiliar para garantir número válido
-const toSafeNumber = (val: unknown): number => {
-  if (typeof val !== 'number' || !Number.isFinite(val) || Number.isNaN(val)) {
-    return 0;
-  }
-  return val;
-};
-
 export function InputCard({ 
   label, 
   value, 
@@ -33,104 +25,86 @@ export function InputCard({
   suffix, 
   icon,
   description,
-  step = 1,
   min = 0,
   className 
 }: InputCardProps) {
-  const [displayValue, setDisplayValue] = useState("");
-  const [isFocused, setIsFocused] = useState(false);
+  const [inputText, setInputText] = useState("");
 
-  // Valor seguro garantido
-  const safeValue = toSafeNumber(value);
-
-  const formatForDisplay = useCallback((val: number): string => {
-    try {
-      const safe = toSafeNumber(val);
-      if (suffix === "%") {
-        return safe.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
-      }
-      return safe.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    } catch {
-      return "0";
+  // Formata número para exibição (formato brasileiro)
+  const formatNumber = (num: number): string => {
+    if (!Number.isFinite(num) || Number.isNaN(num)) return "0";
+    
+    if (suffix === "%") {
+      // Para percentuais, mostra até 2 casas decimais apenas se necessário
+      if (num % 1 === 0) return num.toString();
+      return num.toFixed(2).replace('.', ',').replace(/,?0+$/, '');
     }
-  }, [suffix]);
+    
+    // Para valores monetários, sempre 2 casas decimais
+    return num.toLocaleString('pt-BR', { 
+      minimumFractionDigits: 2, 
+      maximumFractionDigits: 2 
+    });
+  };
 
+  // Sincroniza o texto exibido com o valor externo
   useEffect(() => {
-    if (!isFocused) {
-      setDisplayValue(formatForDisplay(safeValue));
+    const safeValue = Number.isFinite(value) ? value : 0;
+    setInputText(formatNumber(safeValue));
+  }, [value, suffix]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value;
+    
+    // Permite campo vazio durante edição
+    if (raw === "") {
+      setInputText("");
+      return;
     }
-  }, [safeValue, isFocused, formatForDisplay]);
-
-  const handleFocus = useCallback(() => {
-    setIsFocused(true);
-    try {
-      const str = safeValue.toString().replace('.', ',');
-      setDisplayValue(str);
-    } catch {
-      setDisplayValue("0");
+    
+    // Remove caracteres inválidos, mantém apenas números e vírgula
+    let cleaned = raw.replace(/[^\d,]/g, '');
+    
+    // Trata múltiplas vírgulas - mantém apenas a primeira
+    const firstComma = cleaned.indexOf(',');
+    if (firstComma !== -1) {
+      const beforeComma = cleaned.substring(0, firstComma);
+      const afterComma = cleaned.substring(firstComma + 1).replace(/,/g, '');
+      cleaned = beforeComma + ',' + afterComma.substring(0, 2);
     }
-  }, [safeValue]);
-
-  const handleBlur = useCallback(() => {
-    setIsFocused(false);
-    setDisplayValue(formatForDisplay(safeValue));
-  }, [safeValue, formatForDisplay]);
-
-  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    try {
-      const input = e.target.value || "";
-      
-      // Se vazio, define como 0
-      if (!input.trim()) {
-        setDisplayValue("");
-        onChange(0);
-        return;
-      }
-      
-      // Remove tudo exceto números e vírgula
-      let cleaned = input.replace(/[^\d,]/g, '');
-      
-      // Não permite começar com vírgula
-      if (cleaned.startsWith(',')) {
-        cleaned = '0' + cleaned;
-      }
-      
-      // Permite apenas uma vírgula
-      const parts = cleaned.split(',');
-      if (parts.length > 2) {
-        cleaned = parts[0] + ',' + parts.slice(1).join('');
-      }
-      
-      // Limita casas decimais a 2
-      const newParts = cleaned.split(',');
-      if (newParts[1] && newParts[1].length > 2) {
-        cleaned = newParts[0] + ',' + newParts[1].substring(0, 2);
-      }
-      
-      setDisplayValue(cleaned);
-      
-      // Converte para número
-      const normalizedStr = cleaned.replace(',', '.');
-      const numValue = parseFloat(normalizedStr);
-      
-      // Verifica se é um número válido
-      if (Number.isNaN(numValue) || !Number.isFinite(numValue)) {
-        onChange(0);
-        return;
-      }
-      
+    
+    setInputText(cleaned);
+    
+    // Converte para número
+    const normalized = cleaned.replace(',', '.');
+    const num = parseFloat(normalized);
+    
+    if (Number.isFinite(num) && !Number.isNaN(num)) {
       // Aplica limites
-      const maxValue = suffix === "%" ? 100 : 10000000;
-      const minValue = min >= 0 ? min : 0;
-      const capped = Math.min(Math.max(minValue, numValue), maxValue);
-      
+      const maxVal = suffix === "%" ? 100 : 10000000;
+      const minVal = Math.max(0, min);
+      const capped = Math.min(Math.max(minVal, num), maxVal);
       onChange(capped);
-    } catch {
-      // Em caso de qualquer erro, reseta para 0
-      setDisplayValue("0");
-      onChange(0);
     }
-  }, [onChange, suffix, min]);
+  };
+
+  const handleBlur = () => {
+    // No blur, formata o valor corretamente
+    const safeValue = Number.isFinite(value) ? value : 0;
+    setInputText(formatNumber(safeValue));
+  };
+
+  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    // No focus, mostra valor raw para facilitar edição
+    const safeValue = Number.isFinite(value) ? value : 0;
+    if (suffix === "%") {
+      setInputText(safeValue.toString().replace('.', ','));
+    } else {
+      setInputText(safeValue.toString().replace('.', ','));
+    }
+    // Seleciona todo o texto
+    setTimeout(() => e.target.select(), 0);
+  };
 
   return (
     <Card className={cn("p-5 border-2 border-border hover:border-primary/30 transition-all shadow-sm hover:shadow-md bg-card", className)}>
@@ -147,7 +121,7 @@ export function InputCard({
           )}
           <Input
             type="text"
-            value={displayValue}
+            value={inputText}
             onChange={handleChange}
             onFocus={handleFocus}
             onBlur={handleBlur}
