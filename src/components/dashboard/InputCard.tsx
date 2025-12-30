@@ -1,4 +1,4 @@
-import { ReactNode, useState, useEffect } from "react";
+import { ReactNode, useState, useEffect, useCallback } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,6 +17,14 @@ interface InputCardProps {
   className?: string;
 }
 
+// Função auxiliar para garantir número válido
+const toSafeNumber = (val: unknown): number => {
+  if (typeof val !== 'number' || !Number.isFinite(val) || Number.isNaN(val)) {
+    return 0;
+  }
+  return val;
+};
+
 export function InputCard({ 
   label, 
   value, 
@@ -32,65 +40,97 @@ export function InputCard({
   const [displayValue, setDisplayValue] = useState("");
   const [isFocused, setIsFocused] = useState(false);
 
+  // Valor seguro garantido
+  const safeValue = toSafeNumber(value);
+
+  const formatForDisplay = useCallback((val: number): string => {
+    try {
+      const safe = toSafeNumber(val);
+      if (suffix === "%") {
+        return safe.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+      }
+      return safe.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    } catch {
+      return "0";
+    }
+  }, [suffix]);
+
   useEffect(() => {
     if (!isFocused) {
-      setDisplayValue(formatForDisplay(value));
+      setDisplayValue(formatForDisplay(safeValue));
     }
-  }, [value, isFocused, suffix]);
+  }, [safeValue, isFocused, formatForDisplay]);
 
-  const formatForDisplay = (val: number) => {
-    const safeVal = typeof val === 'number' && isFinite(val) ? val : 0;
-    if (suffix === "%") {
-      return safeVal.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
-    }
-    return safeVal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  };
-
-  const handleFocus = () => {
+  const handleFocus = useCallback(() => {
     setIsFocused(true);
-    const safeVal = typeof value === 'number' && isFinite(value) ? value : 0;
-    setDisplayValue(safeVal.toString().replace('.', ','));
-  };
+    try {
+      const str = safeValue.toString().replace('.', ',');
+      setDisplayValue(str);
+    } catch {
+      setDisplayValue("0");
+    }
+  }, [safeValue]);
 
-  const handleBlur = () => {
+  const handleBlur = useCallback(() => {
     setIsFocused(false);
-    // No blur, formata o valor
-    setDisplayValue(formatForDisplay(value));
-  };
+    setDisplayValue(formatForDisplay(safeValue));
+  }, [safeValue, formatForDisplay]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const input = e.target.value;
-    
-    // Remove tudo exceto números e vírgula
-    let cleaned = input.replace(/[^\d,]/g, '');
-    
-    // Permite apenas uma vírgula
-    const parts = cleaned.split(',');
-    if (parts.length > 2) {
-      cleaned = parts[0] + ',' + parts[1];
-    }
-    
-    // Limita casas decimais
-    if (parts[1] && parts[1].length > 2) {
-      cleaned = parts[0] + ',' + parts[1].substring(0, 2);
-    }
-    
-    setDisplayValue(cleaned);
-    
-    // Converte para número
-    const numValue = parseFloat(cleaned.replace(',', '.'));
-    
-    if (isNaN(numValue) || !isFinite(numValue)) {
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      const input = e.target.value || "";
+      
+      // Se vazio, define como 0
+      if (!input.trim()) {
+        setDisplayValue("");
+        onChange(0);
+        return;
+      }
+      
+      // Remove tudo exceto números e vírgula
+      let cleaned = input.replace(/[^\d,]/g, '');
+      
+      // Não permite começar com vírgula
+      if (cleaned.startsWith(',')) {
+        cleaned = '0' + cleaned;
+      }
+      
+      // Permite apenas uma vírgula
+      const parts = cleaned.split(',');
+      if (parts.length > 2) {
+        cleaned = parts[0] + ',' + parts.slice(1).join('');
+      }
+      
+      // Limita casas decimais a 2
+      const newParts = cleaned.split(',');
+      if (newParts[1] && newParts[1].length > 2) {
+        cleaned = newParts[0] + ',' + newParts[1].substring(0, 2);
+      }
+      
+      setDisplayValue(cleaned);
+      
+      // Converte para número
+      const normalizedStr = cleaned.replace(',', '.');
+      const numValue = parseFloat(normalizedStr);
+      
+      // Verifica se é um número válido
+      if (Number.isNaN(numValue) || !Number.isFinite(numValue)) {
+        onChange(0);
+        return;
+      }
+      
+      // Aplica limites
+      const maxValue = suffix === "%" ? 100 : 10000000;
+      const minValue = min >= 0 ? min : 0;
+      const capped = Math.min(Math.max(minValue, numValue), maxValue);
+      
+      onChange(capped);
+    } catch {
+      // Em caso de qualquer erro, reseta para 0
+      setDisplayValue("0");
       onChange(0);
-      return;
     }
-    
-    // Limites
-    const maxValue = suffix === "%" ? 1000 : 10000000;
-    const capped = Math.min(Math.max(0, numValue), maxValue);
-    
-    onChange(capped);
-  };
+  }, [onChange, suffix, min]);
 
   return (
     <Card className={cn("p-5 border-2 border-border hover:border-primary/30 transition-all shadow-sm hover:shadow-md bg-card", className)}>
