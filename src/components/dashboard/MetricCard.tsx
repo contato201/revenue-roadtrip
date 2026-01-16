@@ -7,7 +7,7 @@ interface MetricCardProps {
   value: string | number;
   icon?: ReactNode;
   description?: string;
-  variant?: "default" | "success" | "warning" | "primary";
+  variant?: "default" | "success" | "warning" | "primary" | "danger";
   className?: string;
 }
 
@@ -32,6 +32,7 @@ export function MetricCard({
             variant === "success" && "text-success",
             variant === "warning" && "text-warning",
             variant === "primary" && "text-primary",
+            variant === "danger" && "text-destructive",
             variant === "default" && "text-foreground"
           )}>
             {value}
@@ -46,6 +47,7 @@ export function MetricCard({
             variant === "success" && "bg-success/10 text-success",
             variant === "warning" && "bg-warning/10 text-warning",
             variant === "primary" && "bg-primary/10 text-primary",
+            variant === "danger" && "bg-destructive/10 text-destructive",
             variant === "default" && "bg-muted text-muted-foreground"
           )}>
             {icon}

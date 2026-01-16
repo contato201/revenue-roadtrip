@@ -14,6 +14,7 @@ interface InputCardProps {
   description?: string;
   step?: number;
   min?: number;
+  max?: number;
   className?: string;
 }
 
@@ -26,9 +27,14 @@ export function InputCard({
   icon,
   description,
   min = 0,
+  max,
   className 
 }: InputCardProps) {
   const [inputText, setInputText] = useState("");
+  const [error, setError] = useState<string | null>(null);
+
+  // Determina o valor máximo baseado no tipo de campo
+  const effectiveMax = max ?? (suffix === "%" ? 100 : 10000000);
 
   // Formata número para exibição (formato brasileiro)
   const formatNumber = (num: number): string => {
@@ -47,10 +53,31 @@ export function InputCard({
     });
   };
 
+  // Valida o valor e retorna mensagem de erro se houver
+  const validate = (num: number): string | null => {
+    if (!Number.isFinite(num) || Number.isNaN(num)) {
+      return "Valor inválido";
+    }
+    if (num < 0) {
+      return "Valor não pode ser negativo";
+    }
+    if (min !== undefined && num < min) {
+      return `Valor mínimo: ${min}`;
+    }
+    if (suffix === "%" && num > 100) {
+      return "Máximo 100%";
+    }
+    if (effectiveMax !== undefined && num > effectiveMax) {
+      return `Valor máximo: ${effectiveMax.toLocaleString('pt-BR')}`;
+    }
+    return null;
+  };
+
   // Sincroniza o texto exibido com o valor externo
   useEffect(() => {
     const safeValue = Number.isFinite(value) ? value : 0;
     setInputText(formatNumber(safeValue));
+    setError(validate(safeValue));
   }, [value, suffix]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,11 +86,15 @@ export function InputCard({
     // Permite campo vazio durante edição
     if (raw === "") {
       setInputText("");
+      setError(null);
       return;
     }
     
     // Remove caracteres inválidos, mantém apenas números e vírgula
-    let cleaned = raw.replace(/[^\d,]/g, '');
+    let cleaned = raw.replace(/[^\d,.-]/g, '');
+    
+    // Remove sinais negativos (não permitido)
+    cleaned = cleaned.replace(/-/g, '');
     
     // Trata múltiplas vírgulas - mantém apenas a primeira
     const firstComma = cleaned.indexOf(',');
@@ -80,18 +111,28 @@ export function InputCard({
     const num = parseFloat(normalized);
     
     if (Number.isFinite(num) && !Number.isNaN(num)) {
+      // Valida o valor
+      const validationError = validate(num);
+      setError(validationError);
+      
       // Aplica limites
-      const maxVal = suffix === "%" ? 100 : 10000000;
       const minVal = Math.max(0, min);
-      const capped = Math.min(Math.max(minVal, num), maxVal);
-      onChange(capped);
+      const capped = Math.min(Math.max(minVal, num), effectiveMax);
+      
+      // Só atualiza se o valor for válido (não negativo)
+      if (num >= 0) {
+        onChange(capped);
+      }
+    } else if (cleaned === "") {
+      setError(null);
     }
   };
 
   const handleBlur = () => {
-    // No blur, formata o valor corretamente
+    // No blur, formata o valor corretamente e valida
     const safeValue = Number.isFinite(value) ? value : 0;
     setInputText(formatNumber(safeValue));
+    setError(validate(safeValue));
   };
 
   const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
@@ -102,15 +143,23 @@ export function InputCard({
     } else {
       setInputText(safeValue.toString().replace('.', ','));
     }
-    // Seleciona todo o texto
+    // Seleciona todo o texto automaticamente para evitar concatenação
     setTimeout(() => e.target.select(), 0);
   };
 
+  const hasError = error !== null;
+
   return (
-    <Card className={cn("p-5 border-2 border-border hover:border-primary/30 transition-all shadow-sm hover:shadow-md bg-card", className)}>
+    <Card className={cn(
+      "p-5 border-2 transition-all shadow-sm hover:shadow-md bg-card",
+      hasError 
+        ? "border-destructive hover:border-destructive/70" 
+        : "border-border hover:border-primary/30",
+      className
+    )}>
       <div className="space-y-4">
         <div className="flex items-center gap-2.5">
-          {icon && <div className="text-primary">{icon}</div>}
+          {icon && <div className={cn("text-primary", hasError && "text-destructive")}>{icon}</div>}
           <Label className="text-base font-display font-semibold text-foreground tracking-tight">{label}</Label>
         </div>
         <div className="relative">
@@ -126,7 +175,10 @@ export function InputCard({
             onFocus={handleFocus}
             onBlur={handleBlur}
             className={cn(
-              "h-12 text-lg font-semibold border-2 border-input focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all bg-background text-foreground",
+              "h-12 text-lg font-semibold border-2 transition-all bg-background text-foreground",
+              hasError 
+                ? "border-destructive focus:border-destructive focus:ring-2 focus:ring-destructive/20" 
+                : "border-input focus:border-primary focus:ring-2 focus:ring-primary/20",
               prefix && "pl-12",
               suffix && "pr-14"
             )}
@@ -139,9 +191,11 @@ export function InputCard({
             </span>
           )}
         </div>
-        {description && (
+        {error ? (
+          <p className="text-xs text-destructive font-medium">{error}</p>
+        ) : description ? (
           <p className="text-xs text-muted-foreground">{description}</p>
-        )}
+        ) : null}
       </div>
     </Card>
   );
