@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Loader2, Sparkles, TrendingUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 interface BenchmarkingCardProps {
   tipo: "local" | "lancamento" | "perpetuo";
@@ -19,31 +20,42 @@ export function BenchmarkingCard({ tipo, onBenchmarksGenerated }: BenchmarkingCa
   const [isLoading, setIsLoading] = useState(false);
   const [explicacao, setExplicacao] = useState("");
   const [kpis, setKpis] = useState<any>(null);
+  
+  // Estados de erro para validação visual
+  const [segmentoError, setSegmentoError] = useState(false);
+  const [produtoError, setProdutoError] = useState(false);
+  const [regiaoError, setRegiaoError] = useState(false);
+  
   const { toast } = useToast();
 
   const handleGenerate = async () => {
+    // Reset errors
+    setSegmentoError(false);
+    setProdutoError(false);
+    setRegiaoError(false);
+    
+    // Validar campos e marcar erros visualmente
+    let hasError = false;
+    
     if (!segmento.trim()) {
-      toast({
-        title: "Campo obrigatório",
-        description: "Por favor, informe o segmento/nicho",
-        variant: "destructive",
-      });
-      return;
+      setSegmentoError(true);
+      hasError = true;
     }
-
+    
     if (!produto.trim()) {
-      toast({
-        title: "Campo obrigatório",
-        description: "Por favor, informe o produto/serviço específico",
-        variant: "destructive",
-      });
-      return;
+      setProdutoError(true);
+      hasError = true;
     }
-
+    
     if (tipo === "local" && !regiao.trim()) {
+      setRegiaoError(true);
+      hasError = true;
+    }
+    
+    if (hasError) {
       toast({
-        title: "Campo obrigatório",
-        description: "Por favor, informe a região de atuação",
+        title: "Campos obrigatórios",
+        description: "Por favor, preencha todos os campos destacados em vermelho",
         variant: "destructive",
       });
       return;
@@ -144,10 +156,21 @@ export function BenchmarkingCard({ tipo, onBenchmarksGenerated }: BenchmarkingCa
                 id="segmento"
                 placeholder="Ex: Saúde, Educação, Emagrecimento..."
                 value={segmento}
-                onChange={(e) => setSegmento(e.target.value)}
+                onChange={(e) => {
+                  setSegmento(e.target.value);
+                  if (e.target.value.trim()) setSegmentoError(false);
+                }}
                 disabled={isLoading}
-                className="border-2 focus:border-primary"
+                className={cn(
+                  "border-2 transition-colors",
+                  segmentoError 
+                    ? "border-destructive focus:border-destructive focus:ring-destructive/20" 
+                    : "focus:border-primary"
+                )}
               />
+              {segmentoError && (
+                <p className="text-xs text-destructive font-medium">Campo obrigatório</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -158,10 +181,21 @@ export function BenchmarkingCard({ tipo, onBenchmarksGenerated }: BenchmarkingCa
                 id="produto"
                 placeholder="Ex: Implante dentário, Curso online, Treino personalizado..."
                 value={produto}
-                onChange={(e) => setProduto(e.target.value)}
+                onChange={(e) => {
+                  setProduto(e.target.value);
+                  if (e.target.value.trim()) setProdutoError(false);
+                }}
                 disabled={isLoading}
-                className="border-2 focus:border-primary"
+                className={cn(
+                  "border-2 transition-colors",
+                  produtoError 
+                    ? "border-destructive focus:border-destructive focus:ring-destructive/20" 
+                    : "focus:border-primary"
+                )}
               />
+              {produtoError && (
+                <p className="text-xs text-destructive font-medium">Campo obrigatório</p>
+              )}
             </div>
           </div>
 
@@ -174,10 +208,21 @@ export function BenchmarkingCard({ tipo, onBenchmarksGenerated }: BenchmarkingCa
                 id="regiao"
                 placeholder="Ex: São Paulo - Zona Sul, Rio de Janeiro - Barra..."
                 value={regiao}
-                onChange={(e) => setRegiao(e.target.value)}
+                onChange={(e) => {
+                  setRegiao(e.target.value);
+                  if (e.target.value.trim()) setRegiaoError(false);
+                }}
                 disabled={isLoading}
-                className="border-2 focus:border-primary"
+                className={cn(
+                  "border-2 transition-colors",
+                  regiaoError 
+                    ? "border-destructive focus:border-destructive focus:ring-destructive/20" 
+                    : "focus:border-primary"
+                )}
               />
+              {regiaoError && (
+                <p className="text-xs text-destructive font-medium">Campo obrigatório</p>
+              )}
             </div>
           )}
         </div>

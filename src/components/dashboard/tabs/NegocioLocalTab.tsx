@@ -3,7 +3,8 @@ import { InputCard } from "../InputCard";
 import { MetricCard } from "../MetricCard";
 import { BenchmarkingCard } from "../BenchmarkingCard";
 import { Card } from "@/components/ui/card";
-import { TrendingUp, DollarSign, Users, Calendar, Target, Phone, UserPlus } from "lucide-react";
+import { TrendingUp, TrendingDown, DollarSign, Users, Calendar, Target, Phone, UserPlus } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 // Função segura para divisão
 const safeDivide = (a: number, b: number, fallback = 0): number => {
@@ -43,6 +44,10 @@ export function NegocioLocalTab() {
   }, [investimento, custoLead, taxaAgendamento, taxaComparecimento, taxaFechamento, ticketMedio]);
 
   const { leads, agendamentos, comparecimentos, vendas, faturamentoBruto, lucro, roi, cac } = calculos;
+
+  // Determina variantes de cor baseado nos valores
+  const lucroVariant = lucro >= 0 ? "success" : "danger";
+  const isLucro = lucro >= 0;
 
   const handleBenchmarksGenerated = (benchmarks: any) => {
     if (!benchmarks) return;
@@ -210,19 +215,38 @@ export function NegocioLocalTab() {
         </Card>
 
         <div className="grid gap-4 md:grid-cols-2">
-          <Card className="p-8 border-l-4 border-l-success bg-success/5">
+          <Card className={cn(
+            "p-8 border-l-4",
+            isLucro 
+              ? "border-l-success bg-success/5" 
+              : "border-l-destructive bg-destructive/5"
+          )}>
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-success/10 rounded-lg">
-                <TrendingUp className="w-10 h-10 text-success" />
+              <div className={cn(
+                "p-3 rounded-lg",
+                isLucro ? "bg-success/10" : "bg-destructive/10"
+              )}>
+                {isLucro ? (
+                  <TrendingUp className={cn("w-10 h-10", isLucro ? "text-success" : "text-destructive")} />
+                ) : (
+                  <TrendingDown className="w-10 h-10 text-destructive" />
+                )}
               </div>
               <div>
-                <p className="text-sm font-medium text-muted-foreground mb-1">SEU LUCRO</p>
-                <p className="text-4xl font-display font-bold text-success">
-                  R$ {lucro.toLocaleString('pt-BR')}
+                <p className="text-sm font-medium text-muted-foreground mb-1">
+                  {isLucro ? "SEU LUCRO" : "SEU PREJUÍZO"}
+                </p>
+                <p className={cn(
+                  "text-4xl font-display font-bold",
+                  isLucro ? "text-success" : "text-destructive"
+                )}>
+                  R$ {Math.abs(lucro).toLocaleString('pt-BR')}
                 </p>
                 <p className="text-sm text-muted-foreground mt-2">
-                  {lucro > 0 
-                    ? `Você lucrará ${roi.toFixed(0)}% sobre o investimento!` 
+                  {isLucro 
+                    ? lucro > 0 
+                      ? `Você lucrará ${roi.toFixed(0)}% sobre o investimento!` 
+                      : 'Sem lucro ou prejuízo'
                     : 'Ajuste os valores para ter lucro'}
                 </p>
               </div>
@@ -238,8 +262,14 @@ export function NegocioLocalTab() {
                 <p>✓ Consegue: <span className="font-bold">{vendas} clientes</span></p>
                 <p>✓ CAC: <span className="font-bold text-primary">R$ {cac.toFixed(2)}</span></p>
                 <p>✓ Fatura: <span className="font-bold text-success">R$ {faturamentoBruto.toLocaleString('pt-BR')}</span></p>
-                <p className="text-base font-bold pt-2 border-t">
-                  = Lucro de <span className="text-success">R$ {lucro.toLocaleString('pt-BR')}</span>
+                <p className={cn(
+                  "text-base font-bold pt-2 border-t",
+                  isLucro ? "" : ""
+                )}>
+                  = {isLucro ? "Lucro" : "Prejuízo"} de{" "}
+                  <span className={isLucro ? "text-success" : "text-destructive"}>
+                    R$ {Math.abs(lucro).toLocaleString('pt-BR')}
+                  </span>
                 </p>
               </div>
             </div>

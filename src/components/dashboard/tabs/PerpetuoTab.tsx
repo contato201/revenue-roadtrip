@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { InputCard } from "../InputCard";
 import { MetricCard } from "../MetricCard";
 import { BenchmarkingCard } from "../BenchmarkingCard";
-import { TrendingUp, DollarSign, Target, Percent, Eye, ShoppingCart } from "lucide-react";
+import { TrendingUp, TrendingDown, DollarSign, Target, Percent, Eye, ShoppingCart } from "lucide-react";
 
 // Função segura para divisão
 const safeDivide = (a: number, b: number, fallback = 0): number => {
@@ -32,6 +32,9 @@ export function PerpetuoTab() {
   }, [investimento, custoPageView, conversaoPagina, ticket]);
 
   const { pageViews, vendas, custoVenda, faturamentoBruto, lucro, roas } = calculos;
+
+  // Determina variante de cor para lucro
+  const lucroVariant = lucro >= 0 ? "success" : "danger";
 
   const handleBenchmarksGenerated = (benchmarks: any) => {
     if (!benchmarks) return;
@@ -143,10 +146,10 @@ export function PerpetuoTab() {
           variant={roas > 3 ? "success" : roas > 1.5 ? "primary" : "warning"}
         />
         <MetricCard
-          label="Lucro Bruto"
-          value={`R$ ${lucro.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-          icon={<TrendingUp className="w-5 h-5" />}
-          variant={lucro > 0 ? "success" : "warning"}
+          label={lucro >= 0 ? "Lucro Bruto" : "Prejuízo"}
+          value={`R$ ${Math.abs(lucro).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+          icon={lucro >= 0 ? <TrendingUp className="w-5 h-5" /> : <TrendingDown className="w-5 h-5" />}
+          variant={lucroVariant}
         />
         <MetricCard
           label="Investimento Total"
