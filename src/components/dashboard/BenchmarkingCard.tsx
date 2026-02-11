@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
 interface BenchmarkingCardProps {
-  tipo: "local" | "lancamento" | "perpetuo";
+  tipo: "local" | "lancamento" | "perpetuo" | "ecommerce";
   onBenchmarksGenerated: (benchmarks: any) => void;
 }
 
