@@ -2,7 +2,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LancamentoTab } from "@/components/dashboard/tabs/LancamentoTab";
 import { PerpetuoTab } from "@/components/dashboard/tabs/PerpetuoTab";
 import { NegocioLocalTab } from "@/components/dashboard/tabs/NegocioLocalTab";
-import { Rocket, RefreshCw, Store, BarChart3 } from "lucide-react";
+import { EcommerceTab } from "@/components/dashboard/tabs/EcommerceTab";
+import { Rocket, RefreshCw, Store, BarChart3, ShoppingBag } from "lucide-react";
 
 const Index = () => {
   return (
@@ -62,6 +63,13 @@ const Index = () => {
               <RefreshCw className="w-4 h-4" />
               <span className="font-medium">Perpétuo</span>
             </TabsTrigger>
+            <TabsTrigger 
+              value="ecommerce"
+              className="flex items-center gap-2 data-[state=active]:bg-card data-[state=active]:shadow-md data-[state=active]:border-2 data-[state=active]:border-primary/30 px-6 py-2.5 rounded-md transition-all"
+            >
+              <ShoppingBag className="w-4 h-4" />
+              <span className="font-medium">E-commerce</span>
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="local" className="space-y-4">
@@ -74,6 +82,10 @@ const Index = () => {
 
           <TabsContent value="perpetuo" className="space-y-4">
             <PerpetuoTab />
+          </TabsContent>
+
+          <TabsContent value="ecommerce" className="space-y-4">
+            <EcommerceTab />
           </TabsContent>
         </Tabs>
       </div>
