@@ -409,6 +409,22 @@ export function BenchmarkingCard({ tipo, onBenchmarksGenerated }: BenchmarkingCa
                 </div>
               </Card>
             )}
+
+            {/* Fontes / Citações do Perplexity */}
+            {kpis.fontes && kpis.fontes.length > 0 && (
+              <Card className="p-4 bg-muted/30 border-border">
+                <p className="text-xs font-semibold text-muted-foreground mb-2">📚 Fontes:</p>
+                <ul className="space-y-1">
+                  {kpis.fontes.map((fonte: string, i: number) => (
+                    <li key={i}>
+                      <a href={fonte} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline truncate block">
+                        {fonte}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </Card>
+            )}
           </div>
         )}
       </div>

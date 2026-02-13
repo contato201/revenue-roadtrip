@@ -1,4 +1,4 @@
-import { ReactNode, useState, useEffect } from "react";
+import { ReactNode, useState, useCallback } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -30,131 +30,75 @@ export function InputCard({
   max,
   className 
 }: InputCardProps) {
-  const [inputText, setInputText] = useState("");
+  const [isFocused, setIsFocused] = useState(false);
+  const [rawText, setRawText] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  // Determina o valor máximo baseado no tipo de campo
   const effectiveMax = max ?? (suffix === "%" ? 100 : 10000000);
 
-  // Formata número para exibição (formato brasileiro)
-  const formatNumber = (num: number): string => {
-    if (!Number.isFinite(num) || Number.isNaN(num)) return "0";
-    
+  const formatDisplay = useCallback((num: number): string => {
+    if (!Number.isFinite(num)) return "0";
     if (suffix === "%") {
-      // Para percentuais, mostra até 2 casas decimais apenas se necessário
-      if (num % 1 === 0) return num.toString();
-      return num.toFixed(2).replace('.', ',').replace(/,?0+$/, '');
+      return num % 1 === 0 ? num.toString() : num.toFixed(2).replace('.', ',').replace(/,?0+$/, '');
     }
-    
-    // Para valores monetários, sempre 2 casas decimais
-    return num.toLocaleString('pt-BR', { 
-      minimumFractionDigits: 2, 
-      maximumFractionDigits: 2 
-    });
-  };
+    return num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }, [suffix]);
 
-  // Valida o valor e retorna mensagem de erro se houver
-  const validate = (num: number): string | null => {
-    if (!Number.isFinite(num) || Number.isNaN(num)) {
-      return "Valor inválido";
-    }
-    if (num < 0) {
-      return "Valor não pode ser negativo";
-    }
-    if (min !== undefined && num < min) {
-      return `Valor mínimo: ${min}`;
-    }
-    if (suffix === "%" && num > 100) {
-      return "Máximo 100%";
-    }
-    if (effectiveMax !== undefined && num > effectiveMax) {
-      return `Valor máximo: ${effectiveMax.toLocaleString('pt-BR')}`;
-    }
+  const validate = useCallback((num: number): string | null => {
+    if (num < 0) return "Valor não pode ser negativo";
+    if (suffix === "%" && num > 100) return "Máximo 100%";
+    if (num > effectiveMax) return `Máximo: ${effectiveMax.toLocaleString('pt-BR')}`;
+    if (min > 0 && num < min) return `Mínimo: ${min}`;
     return null;
-  };
+  }, [suffix, effectiveMax, min]);
 
-  // Sincroniza o texto exibido com o valor externo
-  useEffect(() => {
-    const safeValue = Number.isFinite(value) ? value : 0;
-    setInputText(formatNumber(safeValue));
-    setError(validate(safeValue));
-  }, [value, suffix]);
+  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    setIsFocused(true);
+    const raw = value.toString().replace('.', ',');
+    setRawText(raw);
+    setError(null);
+    setTimeout(() => e.target.select(), 0);
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const raw = e.target.value;
+    const text = e.target.value;
     
-    // Permite campo vazio durante edição
-    if (raw === "") {
-      setInputText("");
+    // Allow empty
+    if (text === "") {
+      setRawText("");
       setError(null);
       return;
     }
-    
-    // Remove caracteres inválidos, mantém apenas números e vírgula
-    let cleaned = raw.replace(/[^\d,.-]/g, '');
-    
-    // Remove sinais negativos (não permitido)
-    cleaned = cleaned.replace(/-/g, '');
-    
-    // Trata múltiplas vírgulas - mantém apenas a primeira
-    const firstComma = cleaned.indexOf(',');
-    if (firstComma !== -1) {
-      const beforeComma = cleaned.substring(0, firstComma);
-      const afterComma = cleaned.substring(firstComma + 1).replace(/,/g, '');
-      cleaned = beforeComma + ',' + afterComma.substring(0, 2);
-    }
-    
-    setInputText(cleaned);
-    
-    // Converte para número
-    const normalized = cleaned.replace(',', '.');
+
+    // Only allow digits, comma, dot
+    const cleaned = text.replace(/[^\d,.]/g, '');
+    setRawText(cleaned);
+
+    // Parse
+    const normalized = cleaned.replace(/\./g, '').replace(',', '.');
     const num = parseFloat(normalized);
     
-    if (Number.isFinite(num) && !Number.isNaN(num)) {
-      // Valida o valor
-      const validationError = validate(num);
-      setError(validationError);
-      
-      // Aplica limites
-      const minVal = Math.max(0, min);
-      const capped = Math.min(Math.max(minVal, num), effectiveMax);
-      
-      // Só atualiza se o valor for válido (não negativo)
-      if (num >= 0) {
-        onChange(capped);
-      }
-    } else if (cleaned === "") {
-      setError(null);
+    if (Number.isFinite(num) && num >= 0) {
+      const clamped = Math.min(Math.max(min, num), effectiveMax);
+      setError(validate(num));
+      onChange(clamped);
     }
   };
 
   const handleBlur = () => {
-    // No blur, formata o valor corretamente e valida
-    const safeValue = Number.isFinite(value) ? value : 0;
-    setInputText(formatNumber(safeValue));
-    setError(validate(safeValue));
+    setIsFocused(false);
+    setRawText("");
+    const safeVal = Number.isFinite(value) ? value : 0;
+    setError(validate(safeVal));
   };
 
-  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
-    // No focus, mostra valor raw para facilitar edição
-    const safeValue = Number.isFinite(value) ? value : 0;
-    if (suffix === "%") {
-      setInputText(safeValue.toString().replace('.', ','));
-    } else {
-      setInputText(safeValue.toString().replace('.', ','));
-    }
-    // Seleciona todo o texto automaticamente para evitar concatenação
-    setTimeout(() => e.target.select(), 0);
-  };
-
+  const displayValue = isFocused ? rawText : formatDisplay(value);
   const hasError = error !== null;
 
   return (
     <Card className={cn(
       "p-5 border-2 transition-all shadow-sm hover:shadow-md bg-card",
-      hasError 
-        ? "border-destructive hover:border-destructive/70" 
-        : "border-border hover:border-primary/30",
+      hasError ? "border-destructive" : "border-border hover:border-primary/30",
       className
     )}>
       <div className="space-y-4">
@@ -170,20 +114,20 @@ export function InputCard({
           )}
           <Input
             type="text"
-            value={inputText}
+            inputMode="decimal"
+            value={displayValue}
             onChange={handleChange}
             onFocus={handleFocus}
             onBlur={handleBlur}
+            autoComplete="off"
             className={cn(
               "h-12 text-lg font-semibold border-2 transition-all bg-background text-foreground",
-              hasError 
-                ? "border-destructive focus:border-destructive focus:ring-2 focus:ring-destructive/20" 
+              hasError
+                ? "border-destructive focus:border-destructive focus:ring-2 focus:ring-destructive/20"
                 : "border-input focus:border-primary focus:ring-2 focus:ring-primary/20",
               prefix && "pl-12",
               suffix && "pr-14"
             )}
-            autoComplete="off"
-            inputMode="decimal"
           />
           {suffix && (
             <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground text-sm font-medium pointer-events-none">
